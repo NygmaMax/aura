@@ -11,7 +11,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// База в оперативной памяти сервера
 let messages = [];
 let activeSessions = new Map();
 
@@ -37,23 +36,40 @@ app.post('/api/download-info', async (req, res) => {
     }
 });
 
-// 2. ЖЕСТКОЕ ПРОКСИРОВАНИЕ (Без плеера)
+// 2. ЖЕСТКОЕ ПРОКСИРОВАНИЕ (С маскировкой)
 app.get('/api/stream', async (req, res) => {
     const fileUrl = req.query.url;
     if (!fileUrl) return res.status(400).send('No URL provided');
 
     try {
-        const response = await fetch(fileUrl);
-        if (!response.ok) throw new Error(`HTTP error!`);
+        // Притворяемся мобильным браузером Safari, чтобы обмануть защиту CDN соцсетей
+        const response = await fetch(fileUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
+                'Accept': '*/*',
+                'Connection': 'keep-alive'
+            }
+        });
+
+        // Если сервер всё равно заблокирован, НЕ выдаем ошибку (чтобы не было файла 21 байт)
+        // Вместо этого перенаправляем браузер пользователя напрямую на видео
+        if (!response.ok) {
+            console.log(`Proxy blocked (${response.status}). Redirecting directly to file.`);
+            return res.redirect(fileUrl);
+        }
         
-        // Убиваем попытки браузера открыть плеер
+        // Заставляем браузер именно СКАЧИВАТЬ файл, а не открывать плеер
         res.setHeader('Content-Disposition', 'attachment; filename="AURA_Video.mp4"');
-        res.setHeader('Content-Type', 'application/octet-stream'); // Говорим браузеру: "это бинарник, только качать!"
+        res.setHeader('Content-Type', 'application/octet-stream'); 
         
+        if (response.headers.get('content-length')) {
+            res.setHeader('Content-Length', response.headers.get('content-length'));
+        }
+
         Readable.fromWeb(response.body).pipe(res);
     } catch (err) {
         console.error('Stream error:', err);
-        res.status(500).send('Failed to stream file');
+        res.redirect(fileUrl); // Последняя линия защиты
     }
 });
 
@@ -83,7 +99,6 @@ app.post('/api/ping', (req, res) => {
 
 app.get('/api/stats', (req, res) => {
     const now = Date.now();
-    // Удаляем тех, кто не пинговал больше 15 секунд (закрыл вкладку)
     for (let [ip, lastSeen] of activeSessions.entries()) {
         if (now - lastSeen > 15000) {
             activeSessions.delete(ip);
