@@ -1,5 +1,5 @@
 /**
- * AURA 2.1 Aurum Edition by Nygma - Backend Core (Render Ready)
+ * AURA 2.2 Aurum Edition by Nygma - Full Stack Core
  */
 
 const translations = {
@@ -64,70 +64,56 @@ const translations = {
 
 let currentLang = 'ru';
 
-// Функция безопасности: предотвращение XSS атак в истории
+// Безопасность для строк
 function escapeHTML(str) {
     return str.replace(/[&<>'"]/g, tag => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
     }[tag] || tag));
 }
 
+// Пинг сервера для реального онлайна (каждые 10 сек)
+function pingServer() {
+    fetch('/api/ping', { method: 'POST' }).catch(() => {});
+}
+setInterval(pingServer, 10000);
+pingServer();
+
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 1. СИСТЕМА ПЕРЕВОДА (i18n)
+    // 1. СИСТЕМА ПЕРЕВОДА
     const langBtns = document.querySelectorAll('.lang-btn');
-    
     function setLanguage(lang) {
         currentLang = lang;
         const dict = translations[lang];
-        
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
             if (dict[key]) el.textContent = dict[key];
         });
-        
-        langBtns.forEach(btn => {
-            btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
-        });
-
+        langBtns.forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-lang') === lang));
         renderHistory(); 
     }
+    langBtns.forEach(btn => btn.addEventListener('click', () => setLanguage(btn.getAttribute('data-lang'))));
 
-    langBtns.forEach(btn => {
-        btn.addEventListener('click', () => setLanguage(btn.getAttribute('data-lang')));
-    });
-
-    // 2. Intersection Observer
+    // 2. АНИМАЦИИ
     const revealElements = document.querySelectorAll('.reveal-up');
     const revealObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
+        entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
     }, { root: null, threshold: 0.15, rootMargin: "0px 0px -50px 0px" });
-
     revealElements.forEach(el => revealObserver.observe(el));
-    
     setTimeout(() => {
-        revealElements.forEach(el => {
-            if(el.getBoundingClientRect().top < window.innerHeight) el.classList.add('visible');
-        });
+        revealElements.forEach(el => { if(el.getBoundingClientRect().top < window.innerHeight) el.classList.add('visible'); });
     }, 100);
 
     // 3. НАВИГАЦИЯ
     const navItems = document.querySelectorAll('.nav-item');
     const tabs = document.querySelectorAll('.tab-pane');
-
     navItems.forEach(item => {
         item.addEventListener('click', () => {
             const targetId = item.getAttribute('data-tab');
-            
             navItems.forEach(n => n.classList.remove('active'));
             tabs.forEach(t => t.classList.remove('active'));
-            
             item.classList.add('active');
             document.getElementById(targetId).classList.add('active');
-
             if(targetId === 'tab-history') renderHistory();
             if(targetId === 'tab-admin') updateAdminStats();
             window.scrollTo({top: 0, behavior: 'smooth'}); 
@@ -144,23 +130,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressPercent = document.getElementById('progressPercent');
     const progressStatus = document.getElementById('progressStatus');
 
-    const supportedPlatforms = [
-        'tiktok.com', 'youtube.com', 'youtu.be', 'instagram.com', 
-        'twitter.com', 'x.com', 'facebook.com', 'fb.watch', 
-        'vk.com', 'pinterest.com', 'reddit.com', 'vimeo.com', 
-        'soundcloud.com', 'twitch.tv'
-    ];
+    const supportedPlatforms = ['tiktok.com', 'youtube.com', 'youtu.be', 'instagram.com', 'twitter.com', 'x.com', 'facebook.com', 'fb.watch', 'vk.com', 'pinterest.com', 'reddit.com', 'vimeo.com', 'soundcloud.com', 'twitch.tv'];
 
     function validateLink(string) {
         try {
             const urlObj = new URL(string);
             const hostname = urlObj.hostname.toLowerCase();
-            const isSupported = supportedPlatforms.some(domain => hostname.includes(domain));
-            if (!isSupported) return 'unsupported';
-            return 'valid';
-        } catch (err) {
-            return 'invalid';
-        }
+            return supportedPlatforms.some(domain => hostname.includes(domain)) ? 'valid' : 'unsupported';
+        } catch (err) { return 'invalid'; }
     }
 
     btnAnalyze.addEventListener('click', () => {
@@ -168,19 +145,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!val) return;
 
         const validationStatus = validateLink(val);
-
         if (validationStatus !== 'valid') {
             const oldText = btnAnalyze.textContent;
-            
-            if (validationStatus === 'invalid') {
-                btnAnalyze.textContent = translations[currentLang].err_invalid_url || "Некорректная ссылка!";
-            } else if (validationStatus === 'unsupported') {
-                btnAnalyze.textContent = translations[currentLang].err_unsupported || "Платформа не поддерживается!";
-            }
-            
+            btnAnalyze.textContent = validationStatus === 'invalid' ? (translations[currentLang].err_invalid_url || "Некорректная ссылка!") : (translations[currentLang].err_unsupported || "Платформа не поддерживается!");
             btnAnalyze.style.background = "var(--danger)";
             btnAnalyze.style.boxShadow = "0 10px 25px rgba(239, 68, 68, 0.4)";
-            
             setTimeout(() => {
                 btnAnalyze.textContent = oldText;
                 btnAnalyze.style.background = "";
@@ -191,7 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         btnAnalyze.style.opacity = '0.5';
         btnAnalyze.textContent = "Анализ алгоритмами...";
-        
         setTimeout(() => {
             btnAnalyze.style.opacity = '1';
             btnAnalyze.textContent = translations[currentLang].btn_analyze;
@@ -207,75 +175,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
         btnDownload.style.display = 'none';
         progressBox.style.display = 'block';
-        
         progressBar.style.width = '20%';
         progressPercent.textContent = '20%';
         progressStatus.textContent = translations[currentLang].status_connecting || "Подключение к API...";
-
-        // ОБРАЩАЕМСЯ К СВОЕМУ СЕРВЕРУ (БЕЗ КЛЮЧЕЙ)
-        const options = {
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json'
-            },
-            body: JSON.stringify({ url: targetUrl })
-        };
 
         try {
             progressBar.style.width = '50%';
             progressPercent.textContent = '50%';
             progressStatus.textContent = "Извлечение медиа...";
 
-            // ВЫЗЫВАЕМ СВОЙ БЭКЕНД
-            const response = await fetch('/api/download', options);
+            // Обращаемся к нашему безопасному серверу
+            const response = await fetch('/api/download-info', {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ url: targetUrl })
+            });
             const data = await response.json();
 
             progressBar.style.width = '80%';
             progressPercent.textContent = '80%';
 
             if (data && data.medias && data.medias.length > 0) {
-                
                 progressBar.style.width = '100%';
                 progressPercent.textContent = '100%';
+                progressStatus.textContent = "Скачивание файла...";
                 
                 const downloadLink = data.medias[0].url;
                 saveHistory(targetUrl, "Auto (Best Quality)");
                 
-                progressStatus.textContent = "Скачивание файла...";
-                
-                try {
-                    const fileRes = await fetch(downloadLink);
-                    if (!fileRes.ok) throw new Error("CORS error");
-                    
-                    const blob = await fileRes.blob();
-                    const blobUrl = window.URL.createObjectURL(blob);
-                    
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = blobUrl;
-                    a.download = `AURA_${Math.floor(Math.random() * 10000)}.mp4`;
-                    
-                    document.body.appendChild(a);
-                    a.click();
-                    
-                    window.URL.revokeObjectURL(blobUrl);
-                    document.body.removeChild(a);
-                    
-                    progressStatus.textContent = "Успешно!";
-                } catch (fetchErr) {
-                    console.warn("Фоновое скачивание заблокировано сервером. Используем альтернативу.");
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = downloadLink + (downloadLink.includes('?') ? '&dl=1' : '?dl=1');
-                    a.download = `AURA_media.mp4`;
-                    a.target = '_blank';
-                    
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    
-                    progressStatus.textContent = "Успешно!";
-                }
+                // Прямое скачивание через сервер (без новых окон)
+                window.location.href = '/api/stream?url=' + encodeURIComponent(downloadLink);
 
                 setTimeout(() => {
                     actionPanel.classList.remove('show');
@@ -283,17 +212,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     btnDownload.style.display = 'block';
                     progressBox.style.display = 'none';
                     progressBar.style.background = "";
-                }, 2000);
+                    progressStatus.textContent = "Успешно!";
+                }, 3000);
 
             } else {
                 throw new Error("Файлы не найдены");
             }
-
         } catch (error) {
             console.error("API Error:", error);
             progressStatus.textContent = "Ошибка доступа!";
             progressBar.style.background = "var(--danger)"; 
-            
             setTimeout(() => {
                 btnDownload.style.display = 'block';
                 progressBox.style.display = 'none';
@@ -319,17 +247,10 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = `<p style="text-align:center; color: var(--text-muted); margin-top: 30px;">${translations[currentLang].hist_empty}</p>`;
             return;
         }
-        
         history.forEach(item => {
             const div = document.createElement('div');
             div.className = 'history-item reveal-up visible';
-            div.innerHTML = `
-                <div>
-                    <div class="history-url">${item.url}</div>
-                    <div class="history-meta">${item.format} • ${item.date}</div>
-                </div>
-                <div class="history-status">OK</div>
-            `;
+            div.innerHTML = `<div><div class="history-url">${item.url}</div><div class="history-meta">${item.format} • ${item.date}</div></div><div class="history-status">OK</div>`;
             container.appendChild(div);
         });
     }
@@ -348,30 +269,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.getElementById('contactForm').addEventListener('submit', (e) => {
+    document.getElementById('contactForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         
         const email = document.getElementById('contactEmail').value;
         const message = document.getElementById('contactMessage').value;
-        const msgs = JSON.parse(localStorage.getItem('aura_v2_msgs')) || [];
         
-        msgs.unshift({ 
-            email: escapeHTML(email), 
-            text: escapeHTML(message), 
-            date: new Date().toLocaleString() 
-        });
-        localStorage.setItem('aura_v2_msgs', JSON.stringify(msgs));
-
         const btn = e.target.querySelector('button');
         const originalText = btn.textContent;
-        btn.textContent = "Отправлено!";
-        btn.style.background = "var(--success)";
-        btn.style.color = "#000";
+        btn.textContent = "Отправка...";
+        
+        // Отправляем реальное сообщение на сервер
+        try {
+            await fetch('/api/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, text: message })
+            });
+            btn.textContent = "Отправлено!";
+            btn.style.background = "var(--success)";
+            btn.style.color = "#000";
+            e.target.reset();
+        } catch (err) {
+            btn.textContent = "Ошибка!";
+            btn.style.background = "var(--danger)";
+        }
+
         setTimeout(() => {
             btn.textContent = originalText;
             btn.style.background = "";
             btn.style.color = "";
-            e.target.reset();
             if(document.getElementById('tab-admin').classList.contains('active')) updateAdminStats();
         }, 2000);
     });
@@ -397,34 +324,55 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { badgeClicks = 0; }, 2000);
     });
 
-    function updateAdminStats() {
+    // Функция обновления админки
+    async function updateAdminStats() {
         const history = JSON.parse(localStorage.getItem('aura_v2_hist')) || [];
         document.getElementById('adminLogCount').textContent = history.length;
-
-        document.getElementById('adminOnlineCount').textContent = Math.floor(Math.random() * 34) + 15;
 
         fetch('https://api.ipify.org?format=json')
             .then(res => res.json())
             .then(data => document.getElementById('adminIP').textContent = data.ip)
             .catch(() => document.getElementById('adminIP').textContent = "Недоступен");
 
+        // Запрашиваем реальный онлайн
+        try {
+            const statsRes = await fetch('/api/stats');
+            const statsData = await statsRes.json();
+            document.getElementById('adminOnlineCount').textContent = statsData.online;
+        } catch (e) {
+            document.getElementById('adminOnlineCount').textContent = "ERR";
+        }
+
+        // Запрашиваем реальные сообщения
         const msgContainer = document.getElementById('adminMessagesBox');
-        const msgs = JSON.parse(localStorage.getItem('aura_v2_msgs')) || [];
-        
-        msgContainer.innerHTML = '';
-        if (msgs.length === 0) {
-            msgContainer.innerHTML = '<div style="color: var(--text-muted); font-size: 14px;">Входящих сообщений нет.</div>';
-        } else {
-            msgs.forEach(m => {
-                msgContainer.innerHTML += `
-                    <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding: 15px 0;">
-                        <div style="color: var(--accent-1); font-size: 12px; margin-bottom: 8px;">${m.date} | От: ${m.email}</div>
-                        <div style="color: var(--text-main); font-size: 15px; line-height: 1.5;">${m.text}</div>
-                    </div>
-                `;
-            });
+        try {
+            const msgsRes = await fetch('/api/messages');
+            const msgs = await msgsRes.json();
+            
+            msgContainer.innerHTML = '';
+            if (msgs.length === 0) {
+                msgContainer.innerHTML = '<div style="color: var(--text-muted); font-size: 14px;">Входящих сообщений нет.</div>';
+            } else {
+                msgs.forEach(m => {
+                    msgContainer.innerHTML += `
+                        <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding: 15px 0;">
+                            <div style="color: var(--accent-1); font-size: 12px; margin-bottom: 8px;">${m.date} | От: ${escapeHTML(m.email)}</div>
+                            <div style="color: var(--text-main); font-size: 15px; line-height: 1.5;">${escapeHTML(m.text)}</div>
+                        </div>
+                    `;
+                });
+            }
+        } catch (e) {
+            msgContainer.innerHTML = '<div style="color: var(--danger); font-size: 14px;">Ошибка загрузки сообщений.</div>';
         }
     }
+
+    // Автообновление админки раз в 5 секунд (если она открыта)
+    setInterval(() => {
+        if (document.getElementById('tab-admin').classList.contains('active')) {
+            updateAdminStats();
+        }
+    }, 5000);
 
     document.getElementById('btnAdminForceClear').addEventListener('click', () => {
         if(confirm("Вы уверены, что хотите стереть все логи скачиваний?")) {
@@ -433,13 +381,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.getElementById('btnAdminClearMsgs').addEventListener('click', () => {
-        if(confirm("Очистить все входящие сообщения?")) {
-            localStorage.removeItem('aura_v2_msgs');
-            updateAdminStats();
+    document.getElementById('btnAdminClearMsgs').addEventListener('click', async () => {
+        if(confirm("Очистить все входящие сообщения на сервере?")) {
+            try {
+                await fetch('/api/messages', { method: 'DELETE' });
+                updateAdminStats();
+            } catch (e) {
+                alert("Ошибка удаления!");
+            }
         }
     });
 
-    // Инициализация
     setLanguage('ru');
 });
