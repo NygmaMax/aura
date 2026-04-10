@@ -1,5 +1,5 @@
 /**
- * AURA 2.2 Aurum Edition by Nygma - Full Stack Core
+ * AURA 2.3 Aurum Edition by Nygma - Ultimate Core
  */
 
 const translations = {
@@ -14,7 +14,6 @@ const translations = {
         hist_title: "История операций", hist_subtitle: "Логи хранятся исключительно локально.", btn_clear: "Очистить лог", hist_empty: "История загрузок пока пуста.",
         about_main_title: "Создано для свободы", about_p1: "Платформа AURA была основана в 2026 году независимым разработчиком Nygma. Главная цель проекта — предоставить удобный, быстрый и безопасный инструмент для работы с медиаконтентом, минуя искусственные ограничения.",
         about_p2: "В отличие от аналогов, AURA использует аппаратное ускорение для отрисовки интерфейса. Мы уважаем вашу приватность: все операции проводятся без сохранения логов на серверах (No-Logs Policy).",
-        about_p3: "Независимая архитектура позволяет обходить региональные блокировки, отдавая оригинальные файлы с CDN серверов напрямую на ваше устройство.",
         feat_sec_title: "Абсолютная приватность", feat_sec_desc: "Ваша история загрузок существует только в оперативной памяти браузера (localStorage). Трафик зашифрован алгоритмами AES-256.",
         sup_title: "Центр поддержки", sup_subtitle: "Ответы на популярные вопросы и связь с Nygma.",
         faq_1_q: "Какое качество видео я получу?", faq_1_a: "AURA автоматически выбирает максимально возможное качество (без водяных знаков), доступное на серверах социальной сети по вашей ссылке.",
@@ -33,7 +32,6 @@ const translations = {
         hist_title: "Operation History", hist_subtitle: "Logs are stored exclusively locally.", btn_clear: "Clear Log", hist_empty: "Download history is empty.",
         about_main_title: "Built for Freedom", about_p1: "AURA was founded in 2026 by Nygma. The main goal is to provide a fast and secure tool for media content, bypassing artificial restrictions.",
         about_p2: "AURA uses hardware acceleration. We respect your privacy: all operations are conducted without saving logs on servers (No-Logs Policy).",
-        about_p3: "Independent architecture bypasses regional blocks, delivering original files from CDN servers directly to your device.",
         feat_sec_title: "Absolute Privacy", feat_sec_desc: "Your download history exists only in localStorage. Traffic is encrypted with AES-256.",
         sup_title: "Support Center", sup_subtitle: "Answers to popular questions and contact with Nygma.",
         faq_1_q: "What video quality will I get?", faq_1_a: "AURA automatically selects the highest possible quality (without watermarks) available on the social network's servers for your link.",
@@ -52,7 +50,6 @@ const translations = {
         hist_title: "Історія операцій", hist_subtitle: "Логи зберігаються виключно локально.", btn_clear: "Очистити лог", hist_empty: "Історія завантажень поки порожня.",
         about_main_title: "Створено для свободи", about_p1: "Платформа AURA була заснована в 2026 році розробником Nygma. Головна мета - надати зручний інструмент для роботи з медіаконтентом.",
         about_p2: "AURA використовує апаратне прискорення. Ми поважаємо вашу приватність: усі операції проводяться без збереження логів (No-Logs Policy).",
-        about_p3: "Незалежна архітектура дозволяє обходити регіональні блокування, віддаючи оригінальні файли з CDN серверів безпосередньо на ваш пристрій.",
         feat_sec_title: "Абсолютна приватність", feat_sec_desc: "Ваша історія завантажень існує тільки в localStorage. Трафік зашифровано алгоритмами AES-256.",
         sup_title: "Центр підтримки", sup_subtitle: "Відповіді на популярні запитання та зв'язок з Nygma.",
         faq_1_q: "Яку якість відео я отримаю?", faq_1_a: "AURA автоматично вибирає максимально можливу якість (без водяних знаків), доступну на серверах соціальної мережі за вашим посиланням.",
@@ -64,14 +61,14 @@ const translations = {
 
 let currentLang = 'ru';
 
-// Безопасность для строк
+// Защита от XSS
 function escapeHTML(str) {
     return str.replace(/[&<>'"]/g, tag => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
     }[tag] || tag));
 }
 
-// Пинг сервера для реального онлайна (каждые 10 сек)
+// Пинг сервера для РЕАЛЬНОГО онлайна
 function pingServer() {
     fetch('/api/ping', { method: 'POST' }).catch(() => {});
 }
@@ -80,7 +77,6 @@ pingServer();
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 1. СИСТЕМА ПЕРЕВОДА
     const langBtns = document.querySelectorAll('.lang-btn');
     function setLanguage(lang) {
         currentLang = lang;
@@ -94,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     langBtns.forEach(btn => btn.addEventListener('click', () => setLanguage(btn.getAttribute('data-lang'))));
 
-    // 2. АНИМАЦИИ
     const revealElements = document.querySelectorAll('.reveal-up');
     const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
@@ -104,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
         revealElements.forEach(el => { if(el.getBoundingClientRect().top < window.innerHeight) el.classList.add('visible'); });
     }, 100);
 
-    // 3. НАВИГАЦИЯ
     const navItems = document.querySelectorAll('.nav-item');
     const tabs = document.querySelectorAll('.tab-pane');
     navItems.forEach(item => {
@@ -120,7 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 4. ЛОГИКА ТЕРМИНАЛА
     const inputUrl = document.getElementById('mediaUrl');
     const btnAnalyze = document.getElementById('btnAnalyze');
     const actionPanel = document.getElementById('actionPanel');
@@ -184,7 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
             progressPercent.textContent = '50%';
             progressStatus.textContent = "Извлечение медиа...";
 
-            // Обращаемся к нашему безопасному серверу
             const response = await fetch('/api/download-info', {
                 method: 'POST',
                 headers: { 'content-type': 'application/json' },
@@ -203,8 +195,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const downloadLink = data.medias[0].url;
                 saveHistory(targetUrl, "Auto (Best Quality)");
                 
-                // Прямое скачивание через сервер (без новых окон)
-                window.location.href = '/api/stream?url=' + encodeURIComponent(downloadLink);
+                // ЖЕСТКОЕ СКАЧИВАНИЕ: Создаем скрытую ссылку и симулируем клик
+                const a = document.createElement('a');
+                a.href = `/api/stream?url=${encodeURIComponent(downloadLink)}`;
+                a.download = 'AURA_Media.mp4'; 
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
 
                 setTimeout(() => {
                     actionPanel.classList.remove('show');
@@ -230,7 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 5. ИСТОРИЯ
     function saveHistory(url, format) {
         const history = JSON.parse(localStorage.getItem('aura_v2_hist')) || [];
         const safeUrl = escapeHTML(url.length > 45 ? url.substring(0, 45) + '...' : url);
@@ -260,7 +256,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderHistory();
     });
 
-    // 6. FAQ И ФОРМА
     document.querySelectorAll('.faq-item').forEach(item => {
         item.querySelector('.faq-question').addEventListener('click', () => {
             const isActive = item.classList.contains('active');
@@ -279,7 +274,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const originalText = btn.textContent;
         btn.textContent = "Отправка...";
         
-        // Отправляем реальное сообщение на сервер
         try {
             await fetch('/api/messages', {
                 method: 'POST',
@@ -303,7 +297,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 2000);
     });
 
-    // 7. СЕКРЕТНАЯ АДМИН-ПАНЕЛЬ (Core Access)
     let badgeClicks = 0;
     const badge = document.getElementById('nygmaBadge');
     
@@ -324,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { badgeClicks = 0; }, 2000);
     });
 
-    // Функция обновления админки
+    // РЕАЛЬНОЕ ОБНОВЛЕНИЕ ДАННЫХ АДМИНКИ (БЕЗ РАНДОМА)
     async function updateAdminStats() {
         const history = JSON.parse(localStorage.getItem('aura_v2_hist')) || [];
         document.getElementById('adminLogCount').textContent = history.length;
@@ -334,16 +327,15 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(data => document.getElementById('adminIP').textContent = data.ip)
             .catch(() => document.getElementById('adminIP').textContent = "Недоступен");
 
-        // Запрашиваем реальный онлайн
         try {
             const statsRes = await fetch('/api/stats');
             const statsData = await statsRes.json();
+            // Реальная цифра с сервера
             document.getElementById('adminOnlineCount').textContent = statsData.online;
         } catch (e) {
             document.getElementById('adminOnlineCount').textContent = "ERR";
         }
 
-        // Запрашиваем реальные сообщения
         const msgContainer = document.getElementById('adminMessagesBox');
         try {
             const msgsRes = await fetch('/api/messages');
@@ -367,7 +359,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Автообновление админки раз в 5 секунд (если она открыта)
     setInterval(() => {
         if (document.getElementById('tab-admin').classList.contains('active')) {
             updateAdminStats();
