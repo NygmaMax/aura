@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AURA by Nygma | Aurum Edition</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23ffb703%22 stroke-width=%222%22 stroke-linejoin=%22round%22><path d=%22M12 2L2 22h20L12 2z%22/><path d=%22M12 10l-5 8h10l-5-8z%22 fill=%22%23ffe600%22 opacity=%220.5%22/></svg>" type="image/svg+xml">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="ambient-bg">
+        <div class="bg-grid"></div>
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+    </div>
+
+    <header class="topbar">
+        <div class="logo-wrapper">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="none">
+                <defs>
+                    <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="var(--accent-1)" />
+                        <stop offset="100%" stop-color="var(--accent-2)" />
+                    </linearGradient>
+                </defs>
+                <path d="M12 2L2 22h20L12 2z" stroke="url(#logo-grad)" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M12 10l-5 8h10l-5-8z" fill="url(#logo-grad)" opacity="0.5"/>
+            </svg>
+            <div class="logo-text">AURA <span class="badge-nygma">by Nygma</span></div>
+        </div>
+        <div class="lang-switcher">
+            <button class="lang-btn active" data-lang="ru">RU</button>
+            <button class="lang-btn" data-lang="uk">UK</button>
+            <button class="lang-btn" data-lang="en">EN</button>
+        </div>
+    </header>
+
+    <nav class="navigation">
+        <button class="nav-item active" data-tab="tab-terminal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+            <span data-i18n="nav_terminal">Терминал</span>
+        </button>
+        <button class="nav-item" data-tab="tab-history">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span data-i18n="nav_history">История</span>
+        </button>
+        <button class="nav-item" data-tab="tab-about">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <span data-i18n="nav_about">О нас</span>
+        </button>
+        <button class="nav-item" data-tab="tab-support">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            <span data-i18n="nav_support">FAQ</span>
+        </button>
+        <button class="nav-item hidden-admin-btn" id="btnAdminNav" data-tab="tab-admin">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>Core</span>
+        </button>
+    </nav>
+
+    <main class="main-container">
+        
+        <section class="tab-pane active" id="tab-terminal">
+            <div class="glass-card main-downloader reveal-up">
+                <h1 class="gradient-text" data-i18n="term_title">Универсальный загрузчик</h1>
+                <p class="subtitle" data-i18n="term_subtitle">Извлекайте медиафайлы из любой социальной сети в оригинальном качестве.</p>
+                
+                <div class="input-area">
+                    <input type="url" id="mediaUrl" placeholder="Вставьте ссылку здесь..." autocomplete="off">
+                    <button id="btnAnalyze" class="btn-glow" data-i18n="btn_analyze">Анализ ссылки</button>
+                </div>
+
+                <div class="action-panel" id="actionPanel">
+                    <div class="progress-container" id="progressBox">
+                        <div class="progress-text">
+                            <span id="progressStatus" data-i18n="status_connecting">Подключение...</span>
+                            <span id="progressPercent">0%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" id="progressBar"></div>
+                        </div>
+                    </div>
+
+                    <button id="btnDownload" class="btn-glow success" data-i18n="btn_download">Начать загрузку</button>
+                </div>
+            </div>
+
+            <div class="platforms-bar reveal-up">
+                <span class="plat-tag">TikTok</span>
+                <span class="plat-tag">Instagram</span>
+                <span class="plat-tag">YouTube</span>
+                <span class="plat-tag">VK</span>
+                <span class="plat-tag">X (Twitter)</span>
+                <span class="plat-tag">Pinterest</span>
+                <span class="plat-tag">+ 40 больше</span>
+            </div>
+
+            <div class="scroll-section">
+                <h2 class="section-title reveal-up" data-i18n="steps_title">Как это работает?</h2>
+                <div class="steps-grid">
+                    <div class="step-card reveal-up" style="transition-delay: 0.1s;">
+                        <div class="step-num">01</div>
+                        <div class="step-icon">📋</div>
+                        <h4 data-i18n="step1_title">Скопируйте ссылку</h4>
+                        <p data-i18n="step1_desc">Найдите нужное видео в приложении и нажмите "Копировать ссылку".</p>
+                    </div>
+                    <div class="step-card reveal-up" style="transition-delay: 0.2s;">
+                        <div class="step-num">02</div>
+                        <div class="step-icon">⚡</div>
+                        <h4 data-i18n="step2_title">Вставьте в AURA</h4>
+                        <p data-i18n="step2_desc">Вставьте ссылку в терминал. Алгоритмы мгновенно найдут скрытые файлы.</p>
+                    </div>
+                    <div class="step-card reveal-up" style="transition-delay: 0.3s;">
+                        <div class="step-num">03</div>
+                        <div class="step-icon">💾</div>
+                        <h4 data-i18n="step3_title">Сохраните файл</h4>
+                        <p data-i18n="step3_desc">Выберите формат и сохраните файл прямо в галерею устройства.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tab-pane" id="tab-history">
+            <div class="glass-card reveal-up">
+                <div class="flex-between">
+                    <div>
+                        <h1 class="gradient-text" data-i18n="hist_title">История операций</h1>
+                        <p class="subtitle" style="font-size: 14px; margin-bottom: 0;" data-i18n="hist_subtitle">Логи хранятся исключительно локально.</p>
+                    </div>
+                    <button id="btnClear" class="btn-text" data-i18n="btn_clear">Очистить лог</button>
+                </div>
+                
+                <div class="history-list" id="historyList"></div>
+            </div>
+        </section>
+
+        <section class="tab-pane" id="tab-about">
+            <div class="glass-card reveal-up">
+                <div class="about-hero">
+                    <div class="logo-glow-wrap">
+                        <svg class="logo-icon-large" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2L2 22h20L12 2z" stroke="url(#logo-grad)" stroke-width="1.5" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="version" id="nygmaBadge" style="cursor: pointer; user-select: none;">Nygma Core 2026</div>
+                </div>
+                
+                <h2 class="section-title" data-i18n="about_main_title" style="margin-bottom: 20px;">Создано для свободы</h2>
+                
+                <div class="about-text-block">
+                    <p data-i18n="about_p1">Платформа AURA была основана в 2026 году независимым разработчиком <strong>Nygma</strong>. Главная цель проекта — предоставить пользователям удобный, быстрый и безопасный инструмент для работы с медиаконтентом, минуя искусственные ограничения корпораций.</p>
+                    <p data-i18n="about_p2">В отличие от аналогов, AURA использует аппаратное ускорение вашего устройства для отрисовки интерфейса, обеспечивая нулевую нагрузку на процессор. Мы уважаем вашу приватность: все операции проводятся без сохранения логов на наших серверах (No-Logs Policy).</p>
+                    <p data-i18n="about_p3" style="color: var(--accent-1); margin-top: 15px; font-weight: 600;">Независимая архитектура позволяет обходить региональные блокировки, отдавая оригинальные файлы с CDN серверов напрямую на ваше устройство.</p>
+                </div>
+
+                <div class="features-layout" style="margin-top: 40px;">
+                    <div class="feat-row reveal-up">
+                        <div class="feat-icon-large">🛡️</div>
+                        <div class="feat-content">
+                            <h3 data-i18n="feat_sec_title">Абсолютная приватность</h3>
+                            <p data-i18n="feat_sec_desc">Ваша история загрузок существует только в оперативной памяти браузера (localStorage). Трафик зашифрован алгоритмами AES-256 (протокол TLS 1.3).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tab-pane" id="tab-support">
+            <div class="glass-card reveal-up">
+                <h1 class="gradient-text" data-i18n="sup_title">Центр поддержки</h1>
+                <p class="subtitle" data-i18n="sup_subtitle">Ответы на популярные вопросы и связь с Nygma.</p>
+
+                <div class="faq-container">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span data-i18n="faq_1_q">Какое качество видео я получу?</span>
+                            <span class="faq-toggle">
+                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </span>
+                        </div>
+                        <div class="faq-answer">
+                            <p data-i18n="faq_1_a">AURA автоматически выбирает максимально возможное качество (без водяных знаков), доступное на серверах социальной сети по вашей ссылке.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span data-i18n="faq_2_q">Где найти скачанные файлы на iPhone?</span>
+                            <span class="faq-toggle">
+                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </span>
+                        </div>
+                        <div class="faq-answer">
+                            <p data-i18n="faq_2_a">По умолчанию Safari сохраняет медиа в системное приложение "Файлы" (папка "Загрузки"). Откройте его, нажмите "Поделиться" и выберите "Сохранить видео", чтобы оно появилось в вашей Фотопленке.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span data-i18n="faq_3_q">Можно ли скачать с закрытого аккаунта?</span>
+                            <span class="faq-toggle">
+                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </span>
+                        </div>
+                        <div class="faq-answer">
+                            <p data-i18n="faq_3_a">Нет. AURA строго соблюдает базовые принципы приватности. Если автор закрыл свой профиль, наши алгоритмы не будут пытаться обойти эту защиту.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-box reveal-up" style="margin-top: 40px;">
+                    <h3 data-i18n="contact_title" style="margin-bottom: 20px;">Задать вопрос Nygma</h3>
+                    <form id="contactForm" class="contact-form">
+                        <div class="input-wrapper">
+                            <input type="text" id="contactEmail" placeholder="Ваш Email или Telegram" required>
+                        </div>
+                        <div class="input-wrapper">
+                            <textarea id="contactMessage" rows="4" placeholder="Опишите вашу проблему или предложение..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn-glow" data-i18n="btn_send">Отправить запрос</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section class="tab-pane" id="tab-admin">
+            <div class="glass-card" style="border-color: var(--accent-1); padding: 40px;">
+                <h1 class="gradient-text">SYSTEM CORE <span style="color:var(--text-muted); font-size: 16px;">// Nygma</span></h1>
+                <p class="subtitle" style="margin-bottom: 30px;">Контрольная панель администратора</p>
+                
+                <div class="admin-stats">
+                    <div class="stat-box">
+                        <div class="stat-label">Online (Симуляция)</div>
+                        <div class="stat-value" id="adminOnlineCount" style="color: var(--accent-1);">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Твой IP Адрес</div>
+                        <div class="stat-value" id="adminIP" style="font-size: 16px; word-break: break-all;">Подключение...</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Локальные логи</div>
+                        <div class="stat-value" id="adminLogCount">0</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <h3 style="margin-bottom: 15px; color: var(--text-main);">Входящие сообщения <span style="font-size: 12px; color: var(--danger);">(Только локальные)</span></h3>
+                    <div id="adminMessagesBox" style="background: #050505; border: 1px solid rgba(255,183,3,0.1); border-radius: 16px; padding: 20px; max-height: 300px; overflow-y: auto;">
+                        </div>
+                </div>
+
+                <div style="margin-top: 30px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn-text" id="btnAdminForceClear" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: #ef4444;">Уничтожить логи</button>
+                    <button class="btn-text" id="btnAdminClearMsgs" style="background: rgba(255, 183, 3, 0.1); color: var(--accent-1); border-color: rgba(255, 183, 3, 0.3);">Очистить сообщения</button>
+                </div>
+            </div>
+        </section>
+
+        <footer class="app-footer">
+            &copy; 2026 AURA by Nygma. <span data-i18n="footer_rights">Все права защищены.</span>
+        </footer>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
