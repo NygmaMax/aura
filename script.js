@@ -1,5 +1,5 @@
 /**
- * AURA 2.3 Aurum Edition by Nygma - Ultimate Core
+ * AURA 2.4 Aurum Edition by Nygma - Ultimate Core
  */
 
 const translations = {
@@ -61,14 +61,13 @@ const translations = {
 
 let currentLang = 'ru';
 
-// Защита от XSS
 function escapeHTML(str) {
     return str.replace(/[&<>'"]/g, tag => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
     }[tag] || tag));
 }
 
-// Пинг сервера для РЕАЛЬНОГО онлайна
+// Пинг сервера для реального онлайна
 function pingServer() {
     fetch('/api/ping', { method: 'POST' }).catch(() => {});
 }
@@ -195,10 +194,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const downloadLink = data.medias[0].url;
                 saveHistory(targetUrl, "Auto (Best Quality)");
                 
-                // ЖЕСТКОЕ СКАЧИВАНИЕ: Создаем скрытую ссылку и симулируем клик
+                // ВАЖНО: Вызов прокси сервера
                 const a = document.createElement('a');
                 a.href = `/api/stream?url=${encodeURIComponent(downloadLink)}`;
-                a.download = 'AURA_Media.mp4'; 
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -317,7 +315,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { badgeClicks = 0; }, 2000);
     });
 
-    // РЕАЛЬНОЕ ОБНОВЛЕНИЕ ДАННЫХ АДМИНКИ (БЕЗ РАНДОМА)
     async function updateAdminStats() {
         const history = JSON.parse(localStorage.getItem('aura_v2_hist')) || [];
         document.getElementById('adminLogCount').textContent = history.length;
@@ -327,10 +324,10 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(data => document.getElementById('adminIP').textContent = data.ip)
             .catch(() => document.getElementById('adminIP').textContent = "Недоступен");
 
+        // ПОЛУЧАЕМ РЕАЛЬНЫЙ ОНЛАЙН БЕЗ РАНДОМА
         try {
             const statsRes = await fetch('/api/stats');
             const statsData = await statsRes.json();
-            // Реальная цифра с сервера
             document.getElementById('adminOnlineCount').textContent = statsData.online;
         } catch (e) {
             document.getElementById('adminOnlineCount').textContent = "ERR";
