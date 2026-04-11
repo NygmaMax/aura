@@ -13,16 +13,15 @@ app.use(express.static(__dirname));
 
 let messages = [];
 
-// База пользователей (добавлено поле email)
+// База пользователей
 let users = [
     { username: 'nygma', password: '123', role: 'admin', avatar: '4', email: 'admin@nygma.core' }
 ];
 let activeSessions = new Map();
 
-// --- АВТОРИЗАЦИЯ И ПРОФИЛЬ ---
+// --- АВТОРИЗАЦИЯ И СИНХРОНИЗАЦИЯ ---
 app.post('/api/register', (req, res) => {
     const { username, password } = req.body;
-    // Проверка на уникальность ника
     if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
         return res.status(400).json({ error: 'Этот никнейм уже занят!' });
     }
@@ -37,30 +36,32 @@ app.post('/api/login', (req, res) => {
     res.json({ success: true, username: user.username, role: user.role, avatar: user.avatar, email: user.email || '' });
 });
 
+// НОВЫЙ ЭНДПОИНТ: Синхронизация данных пользователя в реальном времени
+app.get('/api/user/:username', (req, res) => {
+    const user = users.find(u => u.username === req.params.username);
+    if (user) {
+        res.json({ success: true, role: user.role, avatar: user.avatar, email: user.email });
+    } else {
+        res.status(404).json({ error: 'User not found' });
+    }
+});
+
 app.post('/api/update-avatar', (req, res) => {
     const { username, avatar } = req.body;
     let user = users.find(u => u.username === username);
-    if (user) {
-        user.avatar = avatar;
-        return res.json({ success: true });
-    }
+    if (user) { user.avatar = avatar; return res.json({ success: true }); }
     res.status(400).json({ error: 'User not found' });
 });
 
-// Сохранение Email
 app.post('/api/update-email', (req, res) => {
     const { username, email } = req.body;
     let user = users.find(u => u.username === username);
-    if (user) {
-        user.email = email;
-        return res.json({ success: true });
-    }
+    if (user) { user.email = email; return res.json({ success: true }); }
     res.status(400).json({ error: 'User not found' });
 });
 
 // --- АДМИНКА: УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯМИ ---
 app.get('/api/admin/users', (req, res) => {
-    // Отдаем список без паролей
     const safeUsers = users.map(u => ({ username: u.username, role: u.role, email: u.email }));
     res.json(safeUsers);
 });
@@ -68,10 +69,7 @@ app.get('/api/admin/users', (req, res) => {
 app.post('/api/admin/update-role', (req, res) => {
     const { username, role } = req.body;
     let user = users.find(u => u.username === username);
-    if (user) {
-        user.role = role;
-        return res.json({ success: true });
-    }
+    if (user) { user.role = role; return res.json({ success: true }); }
     res.status(400).json({ error: 'User not found' });
 });
 
@@ -83,18 +81,12 @@ app.post('/api/download-info', async (req, res) => {
     try {
         const response = await fetch('https://auto-download-all-in-one.p.rapidapi.com/v1/social/autolink', {
             method: 'POST',
-            headers: {
-                'content-type': 'application/json',
-                'X-RapidAPI-Key': RAPID_API_KEY,
-                'X-RapidAPI-Host': 'auto-download-all-in-one.p.rapidapi.com'
-            },
+            headers: { 'content-type': 'application/json', 'X-RapidAPI-Key': RAPID_API_KEY, 'X-RapidAPI-Host': 'auto-download-all-in-one.p.rapidapi.com' },
             body: JSON.stringify({ url })
         });
         const data = await response.json();
         res.json(data);
-    } catch (error) {
-        res.status(500).json({ error: 'API Error' });
-    }
+    } catch (error) { res.status(500).json({ error: 'API Error' }); }
 });
 
 app.get('/api/stream', async (req, res) => {
@@ -112,27 +104,17 @@ app.get('/api/stream', async (req, res) => {
 
     try {
         const response = await fetch(fileUrl, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
-                'Accept': '*/*',
-                'Connection': 'keep-alive'
-            }
+            headers: { 'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1', 'Accept': '*/*', 'Connection': 'keep-alive' }
         });
 
         if (!response.ok) return res.redirect(fileUrl);
-        
         const fileName = isAudio ? "AURA_Audio.mp3" : "AURA_Media.mp4";
         res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
         res.setHeader('Content-Type', 'application/octet-stream'); 
-        
-        if (response.headers.get('content-length')) {
-            res.setHeader('Content-Length', response.headers.get('content-length'));
-        }
+        if (response.headers.get('content-length')) res.setHeader('Content-Length', response.headers.get('content-length'));
 
         Readable.fromWeb(response.body).pipe(res);
-    } catch (err) {
-        res.redirect(fileUrl);
-    }
+    } catch (err) { res.redirect(fileUrl); }
 });
 
 // --- СООБЩЕНИЯ И ОНЛАЙН ---
@@ -150,12 +132,7 @@ app.post('/api/ping', (req, res) => {
     const { username, role } = req.body; 
     let currentDownloads = activeSessions.has(ip) ? activeSessions.get(ip).downloads : 0;
 
-    activeSessions.set(ip, {
-        lastSeen: Date.now(),
-        username: username || null,
-        role: role || 'visitor',
-        downloads: currentDownloads || 0
-    });
+    activeSessions.set(ip, { lastSeen: Date.now(), username: username || null, role: role || 'visitor', downloads: currentDownloads || 0 });
     res.json({ success: true });
 });
 
