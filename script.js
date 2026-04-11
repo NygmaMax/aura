@@ -1,5 +1,5 @@
 /**
- * AURA 2.5 Aurum Edition by Nygma - Full Fix & Features
+ * AURA 2.5 Aurum Edition by Nygma - Ultimate Full Fix
  */
 
 let currentUser = localStorage.getItem('aura_user') ? JSON.parse(localStorage.getItem('aura_user')) : null;
@@ -13,12 +13,12 @@ setInterval(pingServer, 10000);
 pingServer();
 
 function escapeHTML(str) {
+    if (!str) return '';
     return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
 }
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- КЛИК ПО ЛОГОТИПУ ---
     document.getElementById('logoBtn').addEventListener('click', () => {
         document.querySelector('[data-tab="tab-terminal"]').click();
     });
@@ -59,7 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     updateUI();
 
-    // Открытие модалки авторизации
     btnOpenLogin.addEventListener('click', () => { isLoginMode = true; switchAuthTab(); authModal.classList.add('active'); });
     btnOpenReg.addEventListener('click', () => { isLoginMode = false; switchAuthTab(); authModal.classList.add('active'); });
     document.getElementById('closeAuth').addEventListener('click', () => authModal.classList.remove('active'));
@@ -75,8 +74,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('tabReg').addEventListener('click', () => { isLoginMode = false; switchAuthTab(); });
 
     document.getElementById('btnSubmitAuth').addEventListener('click', async () => {
-        const u = document.getElementById('authLogin').value;
+        const u = document.getElementById('authLogin').value.trim();
         const p = document.getElementById('authPass').value;
+        if (!u || !p) { document.getElementById('authError').textContent = "Заполните все поля!"; return; }
+
         const endpoint = isLoginMode ? '/api/login' : '/api/register';
         try {
             const res = await fetch(endpoint, {
@@ -84,32 +85,32 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await res.json();
             if (data.success) {
-                currentUser = { username: data.username, role: data.role, avatar: data.avatar || '1' };
+                currentUser = { username: data.username, role: data.role, avatar: data.avatar || '1', email: data.email || '' };
                 localStorage.setItem('aura_user', JSON.stringify(currentUser));
                 authModal.classList.remove('active');
+                document.getElementById('authLogin').value = '';
+                document.getElementById('authPass').value = '';
                 updateUI(); pingServer();
             } else {
-                document.getElementById('authError').textContent = data.error;
+                document.getElementById('authError').textContent = data.error; // Выводит "Этот никнейм уже занят!"
             }
         } catch (e) { document.getElementById('authError').textContent = "Ошибка сервера"; }
     });
 
-    // Открытие модалки профиля
     userProfileBtn.addEventListener('click', () => {
         document.getElementById('profileName').textContent = currentUser.username;
         document.getElementById('profileRoleBadge').innerHTML = getRoleBadge(currentUser.role);
         document.getElementById('profileAvatarBig').textContent = avatars[currentUser.avatar] || '👤';
+        document.getElementById('profileEmail').value = currentUser.email || '';
+        document.getElementById('emailSaveStatus').style.display = 'none';
         
-        // Подсветка текущего аватара
         document.querySelectorAll('.avatar-option').forEach(el => {
             el.classList.toggle('active', el.getAttribute('data-av') === currentUser.avatar);
         });
-        
         profileModal.classList.add('active');
     });
     document.getElementById('closeProfile').addEventListener('click', () => profileModal.classList.remove('active'));
 
-    // Выбор аватара
     document.querySelectorAll('.avatar-option').forEach(opt => {
         opt.addEventListener('click', async () => {
             const newAv = opt.getAttribute('data-av');
@@ -119,13 +120,18 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('profileAvatarBig').textContent = avatars[newAv];
             document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('active'));
             opt.classList.add('active');
-
-            // Отправляем на сервер
-            fetch('/api/update-avatar', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({username: currentUser.username, avatar: newAv})
-            });
+            fetch('/api/update-avatar', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: currentUser.username, avatar: newAv}) });
         });
+    });
+
+    document.getElementById('btnSaveEmail').addEventListener('click', async () => {
+        const email = document.getElementById('profileEmail').value.trim();
+        currentUser.email = email;
+        localStorage.setItem('aura_user', JSON.stringify(currentUser));
+        await fetch('/api/update-email', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: currentUser.username, email: email}) });
+        const status = document.getElementById('emailSaveStatus');
+        status.style.display = 'block';
+        setTimeout(() => { status.style.display = 'none'; }, 2000);
     });
 
     document.getElementById('btnLogout').addEventListener('click', () => {
@@ -152,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
             item.classList.add('active');
             document.getElementById(targetId).classList.add('active');
             if(targetId === 'tab-history') renderHistory();
-            if(targetId === 'tab-admin') updateAdminStats();
+            if(targetId === 'tab-admin') { updateAdminStats(); loadAdminUsersTable(); }
             window.scrollTo({top: 0, behavior: 'smooth'}); 
         });
     });
@@ -170,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnAnalyze.addEventListener('click', () => {
         if (!inputUrl.value.trim()) return;
         btnAnalyze.textContent = "Анализ...";
-        setTimeout(() => { btnAnalyze.textContent = "Анализ"; actionPanel.classList.add('show'); }, 600);
+        setTimeout(() => { btnAnalyze.textContent = "Анализ ссылки"; actionPanel.classList.add('show'); }, 600);
     });
 
     btnDownload.addEventListener('click', async () => {
@@ -196,54 +202,38 @@ document.addEventListener('DOMContentLoaded', () => {
             progressBar.style.width = '60%';
 
             if (data && data.medias && data.medias.length > 0) {
-                let downloadLink = data.medias[0].url; // Дефолт (обычно видео)
+                let downloadLink = data.medias[0].url;
                 let isAudioDownload = false;
 
-                // УМНЫЙ ПОИСК MP3
                 if (q === 'mp3') {
-                    // Ищем в массиве medias объект, который является аудио
                     const audioMedia = data.medias.find(m => m.type === 'audio' || m.extension === 'mp3' || m.quality === 'audio');
-                    if (audioMedia) {
-                        downloadLink = audioMedia.url;
-                        isAudioDownload = true;
-                    } else {
-                        alert("К сожалению, чистая аудио-дорожка не найдена для этого файла сервером API.");
-                        btnDownload.style.display = 'block';
-                        progressBox.style.display = 'none';
+                    if (audioMedia) { downloadLink = audioMedia.url; isAudioDownload = true; } 
+                    else {
+                        alert("К сожалению, чистая аудио-дорожка не найдена для этого файла.");
+                        btnDownload.style.display = 'block'; progressBox.style.display = 'none';
                         return;
                     }
                 }
 
                 progressBar.style.width = '100%';
                 progressStatus.textContent = "Скачивание...";
-                
                 saveHistory(targetUrl, q === 'mp3' ? "🎵 AUDIO (MP3)" : `📺 MP4 - ${q.toUpperCase()}`);
                 
-                // Передаем параметр type=audio чтобы сервер поставил правильное расширение
                 const streamUrl = `/api/stream?url=${encodeURIComponent(downloadLink)}${isAudioDownload ? '&type=audio' : ''}`;
-                
                 const a = document.createElement('a');
-                a.href = streamUrl;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+                a.href = streamUrl; document.body.appendChild(a); a.click(); document.body.removeChild(a);
 
                 setTimeout(() => {
                     actionPanel.classList.remove('show');
-                    inputUrl.value = '';
-                    btnDownload.style.display = 'block';
-                    progressBox.style.display = 'none';
+                    inputUrl.value = ''; btnDownload.style.display = 'block'; progressBox.style.display = 'none';
                 }, 3000);
-
             } else { throw new Error("Файлы не найдены"); }
         } catch (error) {
-            progressStatus.textContent = "Ошибка API!";
-            progressBar.style.background = "var(--danger)"; 
+            progressStatus.textContent = "Ошибка API!"; progressBar.style.background = "var(--danger)"; 
             setTimeout(() => { btnDownload.style.display = 'block'; progressBox.style.display = 'none'; progressBar.style.background = ""; }, 3000);
         }
     });
 
-    // --- ИСТОРИЯ ---
     function saveHistory(url, format) {
         const history = JSON.parse(localStorage.getItem('aura_v2_hist')) || [];
         history.unshift({ url: escapeHTML(url.length > 45 ? url.substring(0, 45) + '...' : url), format, date: new Date().toLocaleDateString() });
@@ -258,13 +248,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     document.getElementById('btnClear').addEventListener('click', () => { localStorage.removeItem('aura_v2_hist'); renderHistory(); });
 
-    // --- СЕКРЕТНЫЙ ВХОД АДМИНА ---
     let badgeClicks = 0;
     document.getElementById('nygmaBadge').addEventListener('click', () => {
         badgeClicks++;
         if (badgeClicks >= 5) {
             if (prompt("SYS_CORE: Key?") === "nygma") {
-                currentUser = { username: 'nygma', role: 'admin', avatar: '4' };
+                currentUser = { username: 'nygma', role: 'admin', avatar: '4', email: '' };
                 localStorage.setItem('aura_user', JSON.stringify(currentUser));
                 updateUI(); btnAdminNav.click(); 
             }
@@ -289,9 +278,47 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } catch (e) {}
     }
+
+    // НОВАЯ ФУНКЦИЯ ДЛЯ ТАБЛИЦЫ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ
+    async function loadAdminUsersTable() {
+        if (!currentUser || currentUser.role !== 'admin') return;
+        try {
+            const res = await fetch('/api/admin/users');
+            const usersList = await res.json();
+            const tbody = document.getElementById('adminAllUsersTable');
+            tbody.innerHTML = '';
+            usersList.forEach(u => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight:bold;">${escapeHTML(u.username)}</td>
+                    <td style="color: var(--text-muted);">${escapeHTML(u.email) || '—'}</td>
+                    <td>${getRoleBadge(u.role)}</td>
+                    <td>
+                        <select class="admin-role-select" data-user="${escapeHTML(u.username)}">
+                            <option value="user" ${u.role === 'user' ? 'selected' : ''}>Пользователь</option>
+                            <option value="pro" ${u.role === 'pro' ? 'selected' : ''}>PRO</option>
+                            <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Админ</option>
+                        </select>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Слушатели для смены ролей
+            document.querySelectorAll('.admin-role-select').forEach(select => {
+                select.addEventListener('change', async (e) => {
+                    const targetUser = e.target.getAttribute('data-user');
+                    const newRole = e.target.value;
+                    await fetch('/api/admin/update-role', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: targetUser, role: newRole}) });
+                    loadAdminUsersTable(); // Обновляем таблицу, чтобы бейдж изменился
+                });
+            });
+
+        } catch(e) {}
+    }
+
     setInterval(() => { if (document.getElementById('tab-admin').classList.contains('active')) updateAdminStats(); }, 5000);
 
-    // Анимации сетки
     const revealElements = document.querySelectorAll('.reveal-up');
     const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
