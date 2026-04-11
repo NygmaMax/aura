@@ -70,32 +70,32 @@
 
         <section class="tab-pane" id="tab-ads">
             <div class="glass-card" style="padding: 40px; width: 100%; max-width: 800px;">
-                <div class="flex-between">
-                    <div>
-                        <h3 style="margin-bottom: 5px; color: var(--text-main);" data-i18n="admin_ad_title">Управление рекламным баннером</h3>
-                        <p style="font-size: 13px; color: var(--text-muted);" data-i18n="admin_ad_desc">Настройте блок, который будет виден на главной странице терминала.</p>
-                    </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="adToggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
+                <h3 style="margin-bottom: 15px; color: var(--text-main);">Управление рекламными кампаниями</h3>
                 
-                <div style="margin-top: 30px;">
-                    <div class="input-wrapper" style="margin-bottom: 15px;">
-                        <label style="color: var(--text-muted); font-size: 12px; margin-left: 5px;" data-i18n="admin_ad_img">URL Картинки (Логотип спонсора)</label>
-                        <input type="text" id="adminAdImage" placeholder="https://..." class="profile-input" style="margin-top: 5px;">
-                    </div>
-                    <div class="input-wrapper" style="margin-bottom: 15px;">
-                        <label style="color: var(--text-muted); font-size: 12px; margin-left: 5px;" data-i18n="admin_ad_link">Ссылка (Куда ведет клик)</label>
-                        <input type="text" id="adminAdLink" placeholder="https://t.me/..." class="profile-input" style="margin-top: 5px;">
-                    </div>
-                    <div class="input-wrapper" style="margin-bottom: 25px;">
-                        <label style="color: var(--text-muted); font-size: 12px; margin-left: 5px;" data-i18n="admin_ad_text">Текст рекламы</label>
-                        <textarea id="adminAdText" rows="2" class="profile-input" style="margin-top: 5px; border-radius: 12px; padding: 15px;" placeholder="Рекламный текст..."></textarea>
-                    </div>
-                    <button id="btnSaveAd" class="btn-glow success" style="width: 100%; padding: 15px; margin-top: 0;" data-i18n="prof_save">Сохранить изменения</button>
-                    <p id="adSaveStatus" style="color: var(--success); text-align: center; margin-top: 15px; display: none;">Сохранено!</p>
+                <div class="admin-table-wrap" style="margin-bottom: 30px;">
+                    <table class="admin-table">
+                        <thead><tr><th>Вкл</th><th>Название</th><th>Действия</th></tr></thead>
+                        <tbody id="adminAdsTable"></tbody>
+                    </table>
+                </div>
+
+                <h4 style="margin-bottom: 15px; color: var(--accent-1);">Добавить / Редактировать кампанию</h4>
+                <input type="hidden" id="adEditId">
+                <div class="input-wrapper" style="margin-bottom: 15px;">
+                    <input type="text" id="adCampName" placeholder="Название (для себя)" class="profile-input">
+                </div>
+                <div class="input-wrapper" style="margin-bottom: 15px;">
+                    <input type="text" id="adCampImage" placeholder="URL Картинки" class="profile-input">
+                </div>
+                <div class="input-wrapper" style="margin-bottom: 15px;">
+                    <input type="text" id="adCampLink" placeholder="Ссылка для перехода" class="profile-input">
+                </div>
+                <div class="input-wrapper" style="margin-bottom: 25px;">
+                    <textarea id="adCampText" rows="2" class="profile-input" style="border-radius: 12px; padding: 15px;" placeholder="Рекламный текст..."></textarea>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button id="btnSaveAd" class="btn-glow success" style="flex: 1; padding: 15px; margin-top: 0;">Сохранить кампанию</button>
+                    <button id="btnClearAdForm" class="btn-text" style="padding: 15px;">Очистить форму</button>
                 </div>
             </div>
         </section>
