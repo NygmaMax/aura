@@ -61,7 +61,8 @@ function getRoleBadge(role) {
 
 function updateUI() {
     if (currentUser) {
-        btnOpenLogin.style.display = 'none'; btnOpenReg.style.display = 'none'; userProfileBtn.style.display = 'flex';
+        btnOpenLogin.style.display = 'none'; btnOpenReg.style.display = 'none'; 
+        userProfileBtn.classList.add('active'); // Используем класс для flex
         document.getElementById('headerUsername').textContent = currentUser.username;
         document.getElementById('headerAvatar').textContent = avatars[currentUser.avatar] || '👤';
         if (document.getElementById('profileRoleBadge')) {
@@ -69,7 +70,8 @@ function updateUI() {
             document.getElementById('profileAvatarBig').textContent = avatars[currentUser.avatar] || '👤';
         }
     } else {
-        btnOpenLogin.style.display = 'block'; btnOpenReg.style.display = 'block'; userProfileBtn.style.display = 'none';
+        btnOpenLogin.style.display = 'block'; btnOpenReg.style.display = 'block'; 
+        userProfileBtn.classList.remove('active');
     }
 }
 
@@ -155,31 +157,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btnTestBuy').addEventListener('click', () => alert("Модуль оплаты находится в разработке."));
 
-    // --- ПЕРЕПИСАННЫЙ И НАДЕЖНЫЙ ВХОД В АДМИНКУ ---
     let badgeClicks = 0;
     let badgeTimer;
     document.getElementById('nygmaBadge').addEventListener('click', () => {
         badgeClicks++;
-        clearTimeout(badgeTimer); // Очищаем таймер, чтобы он не сбрасывался во время быстрых кликов
-        
+        clearTimeout(badgeTimer);
         if (badgeClicks >= 5) {
-            badgeClicks = 0; // Сразу сбрасываем
+            badgeClicks = 0;
             const pass = prompt("SYS_CORE: Enter Password");
-            if (pass === "Maksimus01") {
-                // Если пароль верный, выдаем права локально и перекидываем в админку
-                currentUser = { username: 'nygma', role: 'admin', avatar: '4', email: 'admin@nygma.core' };
-                localStorage.setItem('aura_user', JSON.stringify(currentUser));
-                window.location.href = '/admin.html';
-            } else if (pass !== null) {
-                alert("ACCESS DENIED");
+            if (pass) {
+                fetch('/api/admin/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ key: pass }) })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        currentUser = { username: 'nygma', role: 'admin', avatar: '4', email: 'admin@nygma.core' };
+                        localStorage.setItem('aura_user', JSON.stringify(currentUser));
+                        window.location.href = '/admin.html';
+                    } else alert("ACCESS DENIED");
+                });
             }
         } else {
-            // Если кликов меньше 5, запускаем таймер сброса (1.5 секунды бездействия)
             badgeTimer = setTimeout(() => { badgeClicks = 0; }, 1500);
         }
     });
 
-    // Обработка FAQ аккордеона
     document.querySelectorAll('.faq-item').forEach(item => {
         item.querySelector('.faq-question').addEventListener('click', () => {
             const isActive = item.classList.contains('active');
