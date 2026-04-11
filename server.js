@@ -19,15 +19,15 @@ let users = [
 ];
 let activeSessions = new Map();
 
-// БАЗА РЕКЛАМЫ (По умолчанию выключена)
+// БАЗА РЕКЛАМЫ
 let adSettings = {
     enabled: false,
-    imageUrl: 'https://via.placeholder.com/150/161616/ffb703?text=AD',
-    linkUrl: 'https://t.me/your_channel',
-    text: 'Здесь может быть ваша реклама элитного продукта.'
+    imageUrl: 'https://via.placeholder.com/150/161616/ffb703?text=AURA_AD',
+    linkUrl: 'https://t.me/',
+    text: 'Место для вашей элитной рекламы.'
 };
 
-// --- АВТОРИЗАЦИЯ И ПРОФИЛЬ ---
+// --- АВТОРИЗАЦИЯ И СИНХРОНИЗАЦИЯ ---
 app.post('/api/register', (req, res) => {
     const { username, password } = req.body;
     if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
@@ -46,8 +46,11 @@ app.post('/api/login', (req, res) => {
 
 app.get('/api/user/:username', (req, res) => {
     const user = users.find(u => u.username === req.params.username);
-    if (user) res.json({ success: true, role: user.role, avatar: user.avatar, email: user.email });
-    else res.status(404).json({ error: 'User not found' });
+    if (user) {
+        res.json({ success: true, role: user.role, avatar: user.avatar, email: user.email });
+    } else {
+        res.status(404).json({ error: 'User not found' });
+    }
 });
 
 app.post('/api/update-avatar', (req, res) => {
@@ -64,7 +67,7 @@ app.post('/api/update-email', (req, res) => {
     res.status(400).json({ error: 'User not found' });
 });
 
-// --- АДМИНКА: УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯМИ И РЕКЛАМОЙ ---
+// --- АДМИНКА ---
 app.get('/api/admin/users', (req, res) => {
     const safeUsers = users.map(u => ({ username: u.username, role: u.role, email: u.email }));
     res.json(safeUsers);
@@ -89,6 +92,7 @@ app.post('/api/admin/ad', (req, res) => {
 app.post('/api/download-info', async (req, res) => {
     const { url } = req.body;
     if (!url) return res.status(400).json({ error: 'URL is required' });
+
     try {
         const response = await fetch('https://auto-download-all-in-one.p.rapidapi.com/v1/social/autolink', {
             method: 'POST',
