@@ -10,9 +10,7 @@
 </head>
 <body>
 
-    <div class="ambient-bg">
-        <div class="bg-grid"></div><div class="glow-orb orb-1"></div><div class="glow-orb orb-2"></div><div class="glow-orb orb-3"></div>
-    </div>
+    <div class="ambient-bg"><div class="bg-grid"></div><div class="glow-orb orb-1"></div><div class="glow-orb orb-2"></div><div class="glow-orb orb-3"></div></div>
 
     <header class="topbar">
         <div class="logo-wrapper" id="logoBtn">
@@ -31,8 +29,8 @@
                 <button class="lang-btn" data-lang="en">EN</button>
             </div>
             <div class="top-controls">
-                <button id="btnOpenLogin" class="btn-text" style="padding: 8px 16px;">Войти</button>
-                <button id="btnOpenReg" class="btn-glow" style="padding: 8px 16px; font-size: 13px;">Регистрация</button>
+                <button id="btnOpenLogin" class="btn-text" style="padding: 8px 16px;" data-i18n="btn_login">Войти</button>
+                <button id="btnOpenReg" class="btn-glow" style="padding: 8px 16px; font-size: 13px;" data-i18n="btn_reg">Регистрация</button>
                 
                 <div id="userProfileBtn" style="display: none; cursor: pointer; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 5px 15px 5px 5px; border-radius: 30px; border: 1px solid rgba(255,183,3,0.2); transition: 0.2s;">
                     <div class="avatar-mini" id="headerAvatar">👤</div>
@@ -63,7 +61,7 @@
 
                 <div class="action-panel" id="actionPanel">
                     <div class="format-selector">
-                        <label for="qualitySelect" style="display:block; margin-bottom:10px; color:var(--text-muted); font-size:14px; font-weight: 600;">Выберите формат и качество:</label>
+                        <label for="qualitySelect" style="display:block; margin-bottom:10px; color:var(--text-muted); font-size:14px; font-weight: 600;" data-i18n="prof_format">Выберите формат и качество:</label>
                         <select id="qualitySelect" class="custom-select">
                             <option value="auto">🔥 Auto (Оптимальное видео)</option>
                             <option value="mp3">🎵 Только звук (MP3 / Audio)</option>
@@ -74,13 +72,22 @@
                             <option value="4k" class="pro-locked">👑 MP4 - 4K ULTRA (В разработке)</option>
                         </select>
                     </div>
-
                     <div class="progress-container" id="progressBox">
                         <div class="progress-text"><span id="progressStatus" data-i18n="status_connecting">Подключение...</span><span id="progressPercent">0%</span></div>
                         <div class="progress-track"><div class="progress-fill" id="progressBar"></div></div>
                     </div>
                     <button id="btnDownload" class="btn-glow success" data-i18n="btn_download">Начать загрузку</button>
                 </div>
+            </div>
+
+            <div id="adBannerContainer" style="display: none; width: 100%; max-width: 900px;" class="reveal-up">
+                <a href="#" id="adBannerLink" target="_blank" class="ad-card">
+                    <img id="adBannerImage" src="" alt="Ad" class="ad-image">
+                    <div class="ad-text-wrap">
+                        <span class="ad-badge" data-i18n="ad_sponsor">Спонсор</span>
+                        <p id="adBannerText" class="ad-text"></p>
+                    </div>
+                </a>
             </div>
 
             <div class="platforms-bar reveal-up">
@@ -98,49 +105,9 @@
             </div>
         </section>
 
-        <section class="tab-pane" id="tab-history">
-            <div class="glass-card reveal-up">
-                <div class="flex-between">
-                    <div><h1 class="gradient-text" data-i18n="hist_title">История операций</h1><p class="subtitle" style="font-size: 14px; margin-bottom: 0;" data-i18n="hist_subtitle">Логи хранятся исключительно локально.</p></div>
-                    <button id="btnClear" class="btn-text" data-i18n="btn_clear">Очистить лог</button>
-                </div>
-                <div class="history-list" id="historyList"></div>
-            </div>
-        </section>
-
-        <section class="tab-pane" id="tab-about">
-            <div class="glass-card reveal-up">
-                <div class="about-hero">
-                    <div class="logo-glow-wrap"><svg class="logo-icon-large" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 22h20L12 2z" stroke="url(#logo-grad)" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
-                    <div class="version" id="nygmaBadge" style="cursor: pointer; user-select: none;">Nygma Core 2026</div>
-                </div>
-                <h2 class="section-title" style="margin-bottom: 20px;" data-i18n="about_main_title">Создано для свободы</h2>
-                <div class="about-text-block">
-                    <p data-i18n="about_p1">Платформа AURA была основана в 2026 году независимым разработчиком <strong>Nygma</strong>. Главная цель проекта — предоставить пользователям удобный, быстрый и безопасный инструмент для работы с медиаконтентом.</p>
-                </div>
-                <div class="features-layout" style="margin-top: 40px;">
-                    <div class="feat-row reveal-up"><div class="feat-icon-large">🛡️</div><div class="feat-content"><h3 data-i18n="feat_sec_title">Абсолютная приватность</h3><p data-i18n="feat_sec_desc">Ваша история загрузок существует только в оперативной памяти браузера.</p></div></div>
-                </div>
-            </div>
-        </section>
-
-        <section class="tab-pane" id="tab-support">
-            <div class="glass-card reveal-up">
-                <h1 class="gradient-text" data-i18n="sup_title">Центр поддержки</h1>
-                <p class="subtitle" data-i18n="sup_subtitle">Ответы на популярные вопросы и связь с Nygma.</p>
-                <div class="faq-container">
-                    <div class="faq-item"><div class="faq-question"><span data-i18n="faq_1_q">Какое качество видео я получу?</span><span class="faq-toggle">▼</span></div><div class="faq-answer"><p data-i18n="faq_1_a">AURA автоматически выбирает максимально возможное качество.</p></div></div>
-                </div>
-                <div class="contact-box reveal-up" style="margin-top: 40px;">
-                    <h3 style="margin-bottom: 20px;" data-i18n="contact_title">Задать вопрос Nygma</h3>
-                    <form id="contactForm" class="contact-form">
-                        <div class="input-wrapper"><input type="text" id="contactEmail" placeholder="Ваш Email или Telegram" required></div>
-                        <div class="input-wrapper"><textarea id="contactMessage" rows="4" placeholder="Опишите вашу проблему..." required></textarea></div>
-                        <button type="submit" class="btn-glow" data-i18n="btn_send">Отправить запрос</button>
-                    </form>
-                </div>
-            </div>
-        </section>
+        <section class="tab-pane" id="tab-history"><div class="glass-card reveal-up"><div class="flex-between"><div><h1 class="gradient-text" data-i18n="hist_title">История операций</h1><p class="subtitle" style="font-size: 14px; margin-bottom: 0;" data-i18n="hist_subtitle">Логи хранятся исключительно локально.</p></div><button id="btnClear" class="btn-text" data-i18n="btn_clear">Очистить лог</button></div><div class="history-list" id="historyList"></div></div></section>
+        <section class="tab-pane" id="tab-about"><div class="glass-card reveal-up"><div class="about-hero"><div class="logo-glow-wrap"><svg class="logo-icon-large" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 22h20L12 2z" stroke="url(#logo-grad)" stroke-width="1.5" stroke-linejoin="round"/></svg></div><div class="version" id="nygmaBadge" style="cursor: pointer; user-select: none;">Nygma Core 2026</div></div><h2 class="section-title" style="margin-bottom: 20px;" data-i18n="about_main_title">Создано для свободы</h2><div class="about-text-block"><p data-i18n="about_p1">Платформа AURA была основана в 2026 году независимым разработчиком Nygma.</p></div><div class="features-layout" style="margin-top: 40px;"><div class="feat-row reveal-up"><div class="feat-icon-large">🛡️</div><div class="feat-content"><h3 data-i18n="feat_sec_title">Абсолютная приватность</h3><p data-i18n="feat_sec_desc">Ваша история загрузок существует только в оперативной памяти.</p></div></div></div></div></section>
+        <section class="tab-pane" id="tab-support"><div class="glass-card reveal-up"><h1 class="gradient-text" data-i18n="sup_title">Центр поддержки</h1><p class="subtitle" data-i18n="sup_subtitle">Ответы на популярные вопросы и связь с Nygma.</p><div class="faq-container"><div class="faq-item"><div class="faq-question"><span data-i18n="faq_1_q">Какое качество видео я получу?</span><span class="faq-toggle">▼</span></div><div class="faq-answer"><p data-i18n="faq_1_a">AURA автоматически выбирает максимально возможное качество.</p></div></div></div><div class="contact-box reveal-up" style="margin-top: 40px;"><h3 style="margin-bottom: 20px;" data-i18n="contact_title">Задать вопрос Nygma</h3><form id="contactForm" class="contact-form"><div class="input-wrapper"><input type="text" id="contactEmail" placeholder="Email / Telegram" required></div><div class="input-wrapper"><textarea id="contactMessage" rows="4" placeholder="..." required></textarea></div><button type="submit" class="btn-glow" data-i18n="btn_send">Отправить запрос</button></form></div></div></section>
 
         <footer class="app-footer">&copy; 2026 AURA by Nygma. <span data-i18n="footer_rights">Все права защищены.</span></footer>
     </main>
@@ -148,18 +115,14 @@
     <div class="modal-overlay" id="authModalWindow">
         <div class="modal-box">
             <span class="modal-close" id="closeAuth">×</span>
-            <h2 id="authTitle" style="margin-bottom: 20px; text-align: center;">Вход в систему</h2>
+            <h2 id="authTitle" style="margin-bottom: 20px; text-align: center;" data-i18n="auth_title">Вход в систему</h2>
             <div class="auth-tabs">
-                <button class="auth-tab active" id="tabLogin">Вход</button>
-                <button class="auth-tab" id="tabReg">Регистрация</button>
+                <button class="auth-tab active" id="tabLogin" data-i18n="btn_login">Вход</button>
+                <button class="auth-tab" id="tabReg" data-i18n="btn_reg">Регистрация</button>
             </div>
-            <div class="input-wrapper" style="margin-bottom: 15px;">
-                <input type="text" id="authLogin" placeholder="Логин (без пробелов)" required autocomplete="off">
-            </div>
-            <div class="input-wrapper" style="margin-bottom: 20px;">
-                <input type="password" id="authPass" placeholder="Пароль" required autocomplete="off">
-            </div>
-            <button id="btnSubmitAuth" class="btn-glow" style="width: 100%; padding: 15px;">Войти</button>
+            <div class="input-wrapper" style="margin-bottom: 15px;"><input type="text" id="authLogin" placeholder="Логин" required autocomplete="off"></div>
+            <div class="input-wrapper" style="margin-bottom: 20px;"><input type="password" id="authPass" placeholder="Пароль" required autocomplete="off"></div>
+            <button id="btnSubmitAuth" class="btn-glow" style="width: 100%; padding: 15px;" data-i18n="btn_login">Войти</button>
             <p id="authError" style="color: var(--danger); font-size: 13px; font-weight: 600; margin-top: 15px; text-align: center;"></p>
         </div>
     </div>
@@ -169,43 +132,45 @@
             <span class="modal-close" id="closeProfile">×</span>
             <div class="profile-header">
                 <div class="avatar-large" id="profileAvatarBig">👤</div>
-                <div>
-                    <h2 id="profileName" style="margin-bottom: 5px;">User</h2>
-                    <div id="profileRoleBadge"></div>
-                </div>
+                <div><h2 id="profileName" style="margin-bottom: 5px;">User</h2><div id="profileRoleBadge"></div></div>
             </div>
 
             <div class="profile-settings-section">
-                <h4 class="profile-section-title">Настройки аккаунта:</h4>
-                <p class="profile-label">Выберите Аватар</p>
+                <h4 class="profile-section-title" data-i18n="prof_settings">Настройки аккаунта:</h4>
+                <p class="profile-label" data-i18n="prof_avatar">Выберите Аватар</p>
                 <div class="avatar-selector">
                     <div class="avatar-option" data-av="1">👤</div><div class="avatar-option" data-av="2">🤖</div>
                     <div class="avatar-option" data-av="3">🥷</div><div class="avatar-option" data-av="4">👑</div>
                     <div class="avatar-option" data-av="5">👽</div><div class="avatar-option" data-av="6">🐉</div>
                     <div class="avatar-option" data-av="7">🐯</div><div class="avatar-option" data-av="8">💎</div>
+                    <div class="avatar-option" data-av="9">🦁</div><div class="avatar-option" data-av="10">🦊</div>
+                    <div class="avatar-option" data-av="11">🐺</div><div class="avatar-option" data-av="12">🦅</div>
+                    <div class="avatar-option" data-av="13">🦇</div><div class="avatar-option" data-av="14">🦉</div>
+                    <div class="avatar-option" data-av="15">🐍</div><div class="avatar-option" data-av="16">🕷️</div>
+                    <div class="avatar-option" data-av="17">👻</div><div class="avatar-option" data-av="18">💀</div>
+                    <div class="avatar-option" data-av="19">🤡</div><div class="avatar-option" data-av="20">👹</div>
                 </div>
 
-                <p class="profile-label" style="margin-top: 15px;">Привязать Email</p>
+                <p class="profile-label" style="margin-top: 15px;" data-i18n="prof_email">Привязать Email</p>
                 <div style="display: flex; gap: 10px; align-items: stretch;">
                     <input type="email" id="profileEmail" placeholder="your@email.com" class="profile-input">
-                    <button id="btnSaveEmail" class="btn-text" style="padding: 0 15px; border-radius: 12px;">Сохранить</button>
+                    <button id="btnSaveEmail" class="btn-text" style="padding: 0 15px; border-radius: 12px;" data-i18n="prof_save">Сохранить</button>
                 </div>
-                <p id="emailSaveStatus" style="font-size: 12px; color: var(--success); margin-top: 5px; display: none;">Сохранено!</p>
+                <p id="emailSaveStatus" style="font-size: 12px; color: var(--success); margin-top: 5px; display: none;">OK</p>
             </div>
 
             <div class="pro-banner">
-                <div class="pro-title">AURA <span>PRO</span></div>
-                <p style="font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 15px;">Расширьте свои возможности до максимума.</p>
+                <div class="pro-title" data-i18n="pro_title">AURA <span>PRO</span></div>
+                <p style="font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 15px;" data-i18n="pro_desc">Расширьте свои возможности до максимума.</p>
                 <ul class="pro-features">
-                    <li>✓ Загрузка в качестве 4K ULTRA HD</li>
-                    <li>✓ Безлимитное скачивание (свыше 10 раз в день)</li>
-                    <li>✓ Приоритетные выделенные сервера (Высокая скорость)</li>
-                    <li>✓ Эксклюзивный PRO-бейдж в профиле</li>
+                    <li data-i18n="pro_f1">✓ Загрузка в качестве 4K ULTRA HD</li>
+                    <li data-i18n="pro_f2">✓ Безлимитное скачивание (свыше 10 раз в день)</li>
+                    <li data-i18n="pro_f3">✓ Приоритетные выделенные сервера (Скорость)</li>
+                    <li data-i18n="pro_f4">✓ Эксклюзивный PRO-бейдж в профиле</li>
                 </ul>
-                <button class="btn-glow success" id="btnTestBuy" style="width: 100%; padding: 14px; font-size: 14px; margin-top: 15px;">Оформить подписку (Тест)</button>
+                <button class="btn-glow success" id="btnTestBuy" style="width: 100%; padding: 14px; font-size: 14px; margin-top: 15px;" data-i18n="pro_btn">Оформить подписку</button>
             </div>
-
-            <button id="btnLogout" class="btn-text" style="width: 100%; margin-top: 20px; border-color: rgba(239, 68, 68, 0.3); color: var(--danger);">Выйти из аккаунта</button>
+            <button id="btnLogout" class="btn-text" style="width: 100%; margin-top: 20px; border-color: rgba(239, 68, 68, 0.3); color: var(--danger);" data-i18n="prof_logout">Выйти из аккаунта</button>
         </div>
     </div>
 
