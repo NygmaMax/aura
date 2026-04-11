@@ -72,6 +72,7 @@
                             <option value="4k" class="pro-locked">👑 MP4 - 4K ULTRA (В разработке)</option>
                         </select>
                     </div>
+
                     <div class="progress-container" id="progressBox">
                         <div class="progress-text"><span id="progressStatus" data-i18n="status_connecting">Подключение...</span><span id="progressPercent">0%</span></div>
                         <div class="progress-track"><div class="progress-fill" id="progressBar"></div></div>
@@ -105,9 +106,51 @@
             </div>
         </section>
 
-        <section class="tab-pane" id="tab-history"><div class="glass-card reveal-up"><div class="flex-between"><div><h1 class="gradient-text" data-i18n="hist_title">История операций</h1><p class="subtitle" style="font-size: 14px; margin-bottom: 0;" data-i18n="hist_subtitle">Логи хранятся исключительно локально.</p></div><button id="btnClear" class="btn-text" data-i18n="btn_clear">Очистить лог</button></div><div class="history-list" id="historyList"></div></div></section>
-        <section class="tab-pane" id="tab-about"><div class="glass-card reveal-up"><div class="about-hero"><div class="logo-glow-wrap"><svg class="logo-icon-large" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 22h20L12 2z" stroke="url(#logo-grad)" stroke-width="1.5" stroke-linejoin="round"/></svg></div><div class="version" id="nygmaBadge" style="cursor: pointer; user-select: none;">Nygma Core 2026</div></div><h2 class="section-title" style="margin-bottom: 20px;" data-i18n="about_main_title">Создано для свободы</h2><div class="about-text-block"><p data-i18n="about_p1">Платформа AURA была основана в 2026 году независимым разработчиком Nygma.</p></div><div class="features-layout" style="margin-top: 40px;"><div class="feat-row reveal-up"><div class="feat-icon-large">🛡️</div><div class="feat-content"><h3 data-i18n="feat_sec_title">Абсолютная приватность</h3><p data-i18n="feat_sec_desc">Ваша история загрузок существует только в оперативной памяти.</p></div></div></div></div></section>
-        <section class="tab-pane" id="tab-support"><div class="glass-card reveal-up"><h1 class="gradient-text" data-i18n="sup_title">Центр поддержки</h1><p class="subtitle" data-i18n="sup_subtitle">Ответы на популярные вопросы и связь с Nygma.</p><div class="faq-container"><div class="faq-item"><div class="faq-question"><span data-i18n="faq_1_q">Какое качество видео я получу?</span><span class="faq-toggle">▼</span></div><div class="faq-answer"><p data-i18n="faq_1_a">AURA автоматически выбирает максимально возможное качество.</p></div></div></div><div class="contact-box reveal-up" style="margin-top: 40px;"><h3 style="margin-bottom: 20px;" data-i18n="contact_title">Задать вопрос Nygma</h3><form id="contactForm" class="contact-form"><div class="input-wrapper"><input type="text" id="contactEmail" placeholder="Email / Telegram" required></div><div class="input-wrapper"><textarea id="contactMessage" rows="4" placeholder="..." required></textarea></div><button type="submit" class="btn-glow" data-i18n="btn_send">Отправить запрос</button></form></div></div></section>
+        <section class="tab-pane" id="tab-history">
+            <div class="glass-card reveal-up">
+                <div class="flex-between"><div><h1 class="gradient-text" data-i18n="hist_title">История операций</h1><p class="subtitle" style="font-size: 14px; margin-bottom: 0;" data-i18n="hist_subtitle">Логи хранятся исключительно локально.</p></div><button id="btnClear" class="btn-text" data-i18n="btn_clear">Очистить лог</button></div>
+                <div class="history-list" id="historyList"></div>
+            </div>
+        </section>
+
+        <section class="tab-pane" id="tab-about">
+            <div class="glass-card reveal-up">
+                <div class="about-hero">
+                    <div class="logo-glow-wrap"><svg class="logo-icon-large" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 22h20L12 2z" stroke="url(#logo-grad)" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+                    <div class="version" id="nygmaBadge" style="cursor: pointer; user-select: none;">Nygma Core 2026</div>
+                </div>
+                <h2 class="section-title" style="margin-bottom: 20px;" data-i18n="about_main_title">Создано для свободы</h2>
+                <div class="about-text-block">
+                    <p data-i18n="about_p1">Платформа AURA была основана в 2026 году независимым разработчиком Nygma. Изначально задуманная как десктопное приложение на Flet, AURA эволюционировала в мощный Full-Stack веб-сервис.</p>
+                    <p data-i18n="about_p2">Наша архитектура "Aurum Obsidian" объединяет максимальную производительность с элитарным дизайном. Никаких компромиссов в качестве.</p>
+                </div>
+                <div class="features-layout" style="margin-top: 40px;">
+                    <div class="feat-row reveal-up"><div class="feat-icon-large">🛡️</div><div class="feat-content"><h3 data-i18n="feat_sec_title">Абсолютная приватность</h3><p data-i18n="feat_sec_desc">Ваша история загрузок существует только в оперативной памяти устройства.</p></div></div>
+                    <div class="feat-row reveal-up" style="margin-top: 15px;"><div class="feat-icon-large">⚡</div><div class="feat-content"><h3 data-i18n="feat_sec_title_2">Direct Stream</h3><p data-i18n="feat_sec_desc_2">Прямое проксирование файлов через наши сервера в обход любых блокировок.</p></div></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="tab-pane" id="tab-support">
+            <div class="glass-card reveal-up">
+                <h1 class="gradient-text" data-i18n="sup_title">Центр поддержки</h1>
+                <p class="subtitle" data-i18n="sup_subtitle">Ответы на популярные вопросы и связь с Nygma.</p>
+                <div class="faq-container">
+                    <div class="faq-item"><div class="faq-question"><span data-i18n="faq_1_q">Какое качество видео я получу?</span><span class="faq-toggle">▼</span></div><div class="faq-answer"><p data-i18n="faq_1_a">AURA автоматически выбирает максимально возможное качество.</p></div></div>
+                    <div class="faq-item"><div class="faq-question"><span data-i18n="faq_2_q">Где найти файлы на iPhone?</span><span class="faq-toggle">▼</span></div><div class="faq-answer"><p data-i18n="faq_2_a">Ищите в приложении "Файлы" (папка Загрузки).</p></div></div>
+                    <div class="faq-item"><div class="faq-question"><span data-i18n="faq_3_q">Можно ли скачать аудио отдельно?</span><span class="faq-toggle">▼</span></div><div class="faq-answer"><p data-i18n="faq_3_a">Да, просто выберите "Только звук (MP3)" в меню форматов перед скачиванием.</p></div></div>
+                    <div class="faq-item"><div class="faq-question"><span data-i18n="faq_4_q">Что дает подписка PRO?</span><span class="faq-toggle">▼</span></div><div class="faq-answer"><p data-i18n="faq_4_a">PRO-аккаунт открывает доступ к скачиванию в 4K, снимает лимиты и повышает скорость.</p></div></div>
+                </div>
+                <div class="contact-box reveal-up" style="margin-top: 40px;">
+                    <h3 style="margin-bottom: 20px;" data-i18n="contact_title">Задать вопрос Nygma</h3>
+                    <form id="contactForm" class="contact-form">
+                        <div class="input-wrapper"><input type="text" id="contactEmail" placeholder="Email / Telegram" required></div>
+                        <div class="input-wrapper"><textarea id="contactMessage" rows="4" placeholder="..." required></textarea></div>
+                        <button type="submit" class="btn-glow" data-i18n="btn_send">Отправить запрос</button>
+                    </form>
+                </div>
+            </div>
+        </section>
 
         <footer class="app-footer">&copy; 2026 AURA by Nygma. <span data-i18n="footer_rights">Все права защищены.</span></footer>
     </main>
@@ -120,7 +163,7 @@
                 <button class="auth-tab active" id="tabLogin" data-i18n="btn_login">Вход</button>
                 <button class="auth-tab" id="tabReg" data-i18n="btn_reg">Регистрация</button>
             </div>
-            <div class="input-wrapper" style="margin-bottom: 15px;"><input type="text" id="authLogin" placeholder="Логин" required autocomplete="off"></div>
+            <div class="input-wrapper" style="margin-bottom: 15px;"><input type="text" id="authLogin" placeholder="Логин (без пробелов)" required autocomplete="off"></div>
             <div class="input-wrapper" style="margin-bottom: 20px;"><input type="password" id="authPass" placeholder="Пароль" required autocomplete="off"></div>
             <button id="btnSubmitAuth" class="btn-glow" style="width: 100%; padding: 15px;" data-i18n="btn_login">Войти</button>
             <p id="authError" style="color: var(--danger); font-size: 13px; font-weight: 600; margin-top: 15px; text-align: center;"></p>
@@ -146,9 +189,6 @@
                     <div class="avatar-option" data-av="9">🦁</div><div class="avatar-option" data-av="10">🦊</div>
                     <div class="avatar-option" data-av="11">🐺</div><div class="avatar-option" data-av="12">🦅</div>
                     <div class="avatar-option" data-av="13">🦇</div><div class="avatar-option" data-av="14">🦉</div>
-                    <div class="avatar-option" data-av="15">🐍</div><div class="avatar-option" data-av="16">🕷️</div>
-                    <div class="avatar-option" data-av="17">👻</div><div class="avatar-option" data-av="18">💀</div>
-                    <div class="avatar-option" data-av="19">🤡</div><div class="avatar-option" data-av="20">👹</div>
                 </div>
 
                 <p class="profile-label" style="margin-top: 15px;" data-i18n="prof_email">Привязать Email</p>
