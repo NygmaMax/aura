@@ -1,7 +1,7 @@
 {
   "name": "aura-core",
-  "version": "2.4.0",
-  "description": "AURA Server Backend",
+  "version": "2.5.0",
+  "description": "AURA Server Backend with Auth",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
