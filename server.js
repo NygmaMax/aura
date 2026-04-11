@@ -12,20 +12,24 @@ app.use(express.json());
 app.use(express.static(__dirname));
 
 let messages = [];
+const ADMIN_CORE_KEY = 'Maksimus01';
 
-// База пользователей
 let users = [
     { username: 'nygma', password: '123', role: 'admin', avatar: '4', email: 'admin@nygma.core' }
 ];
 let activeSessions = new Map();
 
-// БАЗА РЕКЛАМЫ
-let adSettings = {
-    enabled: false,
-    imageUrl: 'https://via.placeholder.com/150/161616/ffb703?text=AURA_AD',
-    linkUrl: 'https://t.me/',
-    text: 'Место для вашей элитной рекламы.'
-};
+// БАЗА РЕКЛАМНЫХ КАМПАНИЙ
+let adCampaigns = [
+    { 
+        id: '1', 
+        name: 'Базовая кампания (Пример)', 
+        imageUrl: 'https://via.placeholder.com/150/161616/ffb703?text=AURA_AD', 
+        linkUrl: 'https://t.me/', 
+        text: 'Место для вашей элитной рекламы.', 
+        isActive: false 
+    }
+];
 
 // --- АВТОРИЗАЦИЯ И СИНХРОНИЗАЦИЯ ---
 app.post('/api/register', (req, res) => {
@@ -46,11 +50,8 @@ app.post('/api/login', (req, res) => {
 
 app.get('/api/user/:username', (req, res) => {
     const user = users.find(u => u.username === req.params.username);
-    if (user) {
-        res.json({ success: true, role: user.role, avatar: user.avatar, email: user.email });
-    } else {
-        res.status(404).json({ error: 'User not found' });
-    }
+    if (user) { res.json({ success: true, role: user.role, avatar: user.avatar, email: user.email }); } 
+    else { res.status(404).json({ error: 'User not found' }); }
 });
 
 app.post('/api/update-avatar', (req, res) => {
@@ -68,6 +69,12 @@ app.post('/api/update-email', (req, res) => {
 });
 
 // --- АДМИНКА ---
+app.post('/api/admin/login', (req, res) => {
+    const { key } = req.body;
+    if (key === ADMIN_CORE_KEY) res.json({ success: true });
+    else res.status(401).json({ error: 'Access Denied' });
+});
+
 app.get('/api/admin/users', (req, res) => {
     const safeUsers = users.map(u => ({ username: u.username, role: u.role, email: u.email }));
     res.json(safeUsers);
@@ -80,11 +87,38 @@ app.post('/api/admin/update-role', (req, res) => {
     res.status(400).json({ error: 'User not found' });
 });
 
-// API РЕКЛАМЫ
-app.get('/api/ad', (req, res) => res.json(adSettings));
-app.post('/api/admin/ad', (req, res) => {
-    const { enabled, imageUrl, linkUrl, text } = req.body;
-    adSettings = { enabled, imageUrl, linkUrl, text };
+// МЕНЕДЖЕР РЕКЛАМЫ
+app.get('/api/ad', (req, res) => {
+    const activeAd = adCampaigns.find(c => c.isActive);
+    if (activeAd) { res.json({ enabled: true, ...activeAd }); } 
+    else { res.json({ enabled: false }); }
+});
+
+app.get('/api/admin/ads', (req, res) => res.json(adCampaigns));
+
+app.post('/api/admin/ads', (req, res) => {
+    const { id, name, imageUrl, linkUrl, text } = req.body;
+    if (id) {
+        let camp = adCampaigns.find(c => c.id === id);
+        if (camp) { camp.name = name; camp.imageUrl = imageUrl; camp.linkUrl = linkUrl; camp.text = text; }
+    } else {
+        adCampaigns.push({ id: Date.now().toString(), name, imageUrl, linkUrl, text, isActive: false });
+    }
+    res.json({ success: true });
+});
+
+app.post('/api/admin/ads/toggle', (req, res) => {
+    const { id, isActive } = req.body;
+    adCampaigns.forEach(c => c.isActive = false); // Выключаем все
+    if (isActive) {
+        let camp = adCampaigns.find(c => c.id === id);
+        if (camp) camp.isActive = true; // Включаем только выбранную
+    }
+    res.json({ success: true });
+});
+
+app.delete('/api/admin/ads/:id', (req, res) => {
+    adCampaigns = adCampaigns.filter(c => c.id !== req.params.id);
     res.json({ success: true });
 });
 
@@ -92,7 +126,6 @@ app.post('/api/admin/ad', (req, res) => {
 app.post('/api/download-info', async (req, res) => {
     const { url } = req.body;
     if (!url) return res.status(400).json({ error: 'URL is required' });
-
     try {
         const response = await fetch('https://auto-download-all-in-one.p.rapidapi.com/v1/social/autolink', {
             method: 'POST',
