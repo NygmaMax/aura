@@ -9,57 +9,106 @@
 </head>
 <body>
 
-    <div class="ambient-bg">
-        <div class="bg-grid"></div><div class="glow-orb orb-1"></div><div class="glow-orb orb-2"></div>
-    </div>
+    <div class="ambient-bg"><div class="bg-grid"></div><div class="glow-orb orb-1"></div><div class="glow-orb orb-2"></div></div>
 
     <header class="topbar">
         <div class="logo-wrapper" onclick="window.location.href='/'">
-            <div class="logo-text">AURA <span class="badge-nygma">BACK TO SITE</span></div>
+            <div class="logo-text">AURA <span class="badge-nygma" data-i18n="admin_back">BACK TO SITE</span></div>
         </div>
-        <div style="color: var(--danger); font-weight: bold; text-transform: uppercase;">Superuser Access</div>
+        <div class="header-right">
+            <div class="lang-switcher">
+                <button class="lang-btn active" data-lang="ru">RU</button>
+                <button class="lang-btn" data-lang="uk">UK</button>
+                <button class="lang-btn" data-lang="en">EN</button>
+            </div>
+            <div style="color: var(--danger); font-weight: bold; text-transform: uppercase;">Superuser Access</div>
+        </div>
     </header>
 
-    <main class="main-container" style="margin-top: 40px;">
-        <div class="glass-card" style="border-color: var(--danger); padding: 40px; width: 100%; max-width: 1000px;">
-            <h1 class="gradient-text">SYSTEM CORE <span style="color:var(--text-muted); font-size: 16px;">// Root</span></h1>
-            <p class="subtitle" style="margin-bottom: 30px;">Глобальная панель управления сервером</p>
-            
-            <div class="admin-stats">
-                <div class="stat-box"><div class="stat-label">АКТИВНЫЙ ОНЛАЙН</div><div class="stat-value" id="adminOnlineCount" style="color: var(--accent-1);">0</div></div>
-                <div class="stat-box"><div class="stat-label">Твой IP Адрес</div><div class="stat-value" id="adminIP" style="font-size: 16px;">Подключение...</div></div>
-            </div>
+    <nav class="navigation">
+        <button class="nav-item active" data-tab="tab-dash"><span data-i18n="admin_nav_dash">Дашборд (Live)</span></button>
+        <button class="nav-item" data-tab="tab-users"><span data-i18n="admin_nav_users">Пользователи</span></button>
+        <button class="nav-item" data-tab="tab-ads"><span data-i18n="admin_nav_ads">Реклама</span></button>
+        <button class="nav-item" data-tab="tab-msgs"><span data-i18n="admin_nav_msgs">Сообщения</span></button>
+    </nav>
 
-            <div style="margin-top: 40px;">
-                <h3 style="margin-bottom: 15px; color: var(--text-main);">Мониторинг онлайна (Live сессии)</h3>
-                <div class="admin-table-wrap">
-                    <table class="admin-table">
-                        <thead><tr><th>IP Адрес</th><th>Пользователь</th><th>Статус / Роль</th><th>Скачиваний</th></tr></thead>
-                        <tbody id="adminUsersTable"></tbody>
-                    </table>
+    <main class="main-container">
+        
+        <section class="tab-pane active" id="tab-dash">
+            <div class="glass-card" style="border-color: var(--danger); padding: 40px; width: 100%; max-width: 1000px;">
+                <h1 class="gradient-text">SYSTEM CORE <span style="color:var(--text-muted); font-size: 16px;">// Root</span></h1>
+                <p class="subtitle" style="margin-bottom: 30px;" data-i18n="admin_title_main">Глобальная панель управления сервером</p>
+                
+                <div class="admin-stats">
+                    <div class="stat-box"><div class="stat-label" data-i18n="admin_stat_online">АКТИВНЫЙ ОНЛАЙН</div><div class="stat-value" id="adminOnlineCount" style="color: var(--accent-1);">0</div></div>
+                    <div class="stat-box"><div class="stat-label" data-i18n="admin_stat_ip">ТВОЙ IP АДРЕС</div><div class="stat-value" id="adminIP" style="font-size: 16px;">Подключение...</div></div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <h3 style="margin-bottom: 15px; color: var(--text-main);" data-i18n="admin_dash_live">Мониторинг онлайна (Live сессии)</h3>
+                    <div class="admin-table-wrap">
+                        <table class="admin-table">
+                            <thead><tr><th>IP Адрес</th><th data-i18n="admin_th_user">Пользователь</th><th data-i18n="admin_th_role">Статус / Роль</th><th data-i18n="admin_th_dl">Скачиваний</th></tr></thead>
+                            <tbody id="adminUsersTable"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <div style="margin-top: 40px;">
-                <h3 style="margin-bottom: 15px; color: var(--text-main);">База зарегистрированных пользователей</h3>
+        <section class="tab-pane" id="tab-users">
+            <div class="glass-card" style="padding: 40px; width: 100%; max-width: 1000px;">
+                <h3 style="margin-bottom: 15px; color: var(--text-main);" data-i18n="admin_users_title">База зарегистрированных пользователей</h3>
                 <div class="admin-table-wrap">
                     <table class="admin-table">
-                        <thead><tr><th>Никнейм</th><th>Email</th><th>Текущая Роль</th><th>Изменить Роль</th></tr></thead>
+                        <thead><tr><th data-i18n="admin_th_nick">Никнейм</th><th>Email</th><th data-i18n="admin_th_crole">Текущая Роль</th><th data-i18n="admin_th_action">Изменить Роль</th></tr></thead>
                         <tbody id="adminAllUsersTable"></tbody>
                     </table>
                 </div>
             </div>
+        </section>
 
-            <div style="margin-top: 40px;">
-                <h3 style="margin-bottom: 15px; color: var(--text-main);">Входящие сообщения (Форма связи)</h3>
-                <div id="adminMessagesBox" style="background: #050505; border: 1px solid rgba(255,183,3,0.1); border-radius: 16px; padding: 20px; max-height: 300px; overflow-y: auto;"></div>
+        <section class="tab-pane" id="tab-ads">
+            <div class="glass-card" style="padding: 40px; width: 100%; max-width: 800px;">
+                <div class="flex-between">
+                    <div>
+                        <h3 style="margin-bottom: 5px; color: var(--text-main);" data-i18n="admin_ad_title">Управление рекламным баннером</h3>
+                        <p style="font-size: 13px; color: var(--text-muted);" data-i18n="admin_ad_desc">Настройте блок, который будет виден на главной странице терминала.</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="adToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <div class="input-wrapper" style="margin-bottom: 15px;">
+                        <label style="color: var(--text-muted); font-size: 12px; margin-left: 5px;" data-i18n="admin_ad_img">URL Картинки (Логотип спонсора)</label>
+                        <input type="text" id="adminAdImage" placeholder="https://..." class="profile-input" style="margin-top: 5px;">
+                    </div>
+                    <div class="input-wrapper" style="margin-bottom: 15px;">
+                        <label style="color: var(--text-muted); font-size: 12px; margin-left: 5px;" data-i18n="admin_ad_link">Ссылка (Куда ведет клик)</label>
+                        <input type="text" id="adminAdLink" placeholder="https://t.me/..." class="profile-input" style="margin-top: 5px;">
+                    </div>
+                    <div class="input-wrapper" style="margin-bottom: 25px;">
+                        <label style="color: var(--text-muted); font-size: 12px; margin-left: 5px;" data-i18n="admin_ad_text">Текст рекламы</label>
+                        <textarea id="adminAdText" rows="2" class="profile-input" style="margin-top: 5px; border-radius: 12px; padding: 15px;" placeholder="Рекламный текст..."></textarea>
+                    </div>
+                    <button id="btnSaveAd" class="btn-glow success" style="width: 100%; padding: 15px; margin-top: 0;" data-i18n="prof_save">Сохранить изменения</button>
+                    <p id="adSaveStatus" style="color: var(--success); text-align: center; margin-top: 15px; display: none;">Сохранено!</p>
+                </div>
             </div>
-            
-            <div style="margin-top: 30px; display: flex; gap: 10px;">
-                <button class="btn-text" id="btnAdminClearMsgs" style="color: var(--accent-1); border-color: var(--accent-1);">Очистить сообщения</button>
-                <button class="btn-text" onclick="window.location.href='/'">Выйти из панели</button>
+        </section>
+
+        <section class="tab-pane" id="tab-msgs">
+            <div class="glass-card" style="padding: 40px; width: 100%; max-width: 1000px;">
+                <h3 style="margin-bottom: 15px; color: var(--text-main);" data-i18n="admin_msg_title">Входящие сообщения (Форма связи)</h3>
+                <div id="adminMessagesBox" style="background: #050505; border: 1px solid rgba(255,183,3,0.1); border-radius: 16px; padding: 20px; max-height: 400px; overflow-y: auto;"></div>
+                <div style="margin-top: 30px; display: flex; gap: 10px;">
+                    <button class="btn-text" id="btnAdminClearMsgs" style="color: var(--accent-1); border-color: var(--accent-1);" data-i18n="admin_btn_clear">Очистить сообщения</button>
+                </div>
             </div>
-        </div>
+        </section>
     </main>
 
     <script src="admin.js"></script>
