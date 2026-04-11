@@ -16,23 +16,24 @@ function escapeHTML(str) { return str ? str.replace(/[&<>'"]/g, tag => ({ '&': '
 function getRoleBadge(role) {
     if (role === 'admin') return '<span class="role-badge badge-admin">Админ</span>';
     if (role === 'pro') return '<span class="role-badge badge-pro">PRO</span>';
-    if (role === 'user') return '<span class="role-badge badge-user">Юзер</span>';
-    return '<span class="role-badge badge-visitor">Гость</span>';
+    if (role === 'user') return '<span class="role-badge badge-user">User</span>';
+    return '<span class="role-badge badge-visitor">Visitor</span>';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- Переводы ---
     const langBtns = document.querySelectorAll('.lang-btn');
     function setLanguage(lang) {
         const dict = adminTranslations[lang];
         document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.getAttribute('data-i18n'); if (dict[key]) el.textContent = dict[key]; });
         langBtns.forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-lang') === lang));
+        const activeTab = document.querySelector('.tab-pane.active').id;
+        if(activeTab === 'tab-dash') updateAdminStats();
+        if(activeTab === 'tab-users') loadAdminUsersTable();
     }
     langBtns.forEach(btn => btn.addEventListener('click', () => setLanguage(btn.getAttribute('data-lang'))));
     setLanguage('ru');
 
-    // --- Навигация ---
     const navItems = document.querySelectorAll('.nav-item');
     const tabs = document.querySelectorAll('.tab-pane');
     navItems.forEach(item => {
@@ -40,22 +41,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetId = item.getAttribute('data-tab');
             navItems.forEach(n => n.classList.remove('active')); tabs.forEach(t => t.classList.remove('active'));
             item.classList.add('active'); document.getElementById(targetId).classList.add('active');
+            if(targetId === 'tab-dash') updateAdminStats();
+            if(targetId === 'tab-users') loadAdminUsersTable();
+            if(targetId === 'tab-ads') loadAdSettings();
         });
     });
 
-    // --- Дашборд ---
     async function updateAdminStats() {
+        if (!currentUser || currentUser.role !== 'admin') return;
         fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => document.getElementById('adminIP').textContent = d.ip).catch(()=>{});
         try {
             const res = await fetch('/api/stats'); const data = await res.json();
             document.getElementById('adminOnlineCount').textContent = data.online;
             const tbody = document.getElementById('adminUsersTable');
-            tbody.innerHTML = data.sessions.length === 0 ? '<tr><td colspan="4" style="text-align:center; color:#888;">Пусто</td></tr>' : '';
+            tbody.innerHTML = data.sessions.length === 0 ? '<tr><td colspan="4" style="text-align:center;">Пусто</td></tr>' : '';
             data.sessions.forEach(s => {
                 const uName = s.username ? `<b>${escapeHTML(s.username)}</b>` : '<span style="color:#666;">Без регистрации</span>';
                 tbody.innerHTML += `<tr><td style="color:var(--accent-1); font-family:monospace;">${s.ip}</td><td>${uName}</td><td>${getRoleBadge(s.role)}</td><td style="text-align:center; font-weight:bold;">${s.downloads}</td></tr>`;
             });
-
             const msgsRes = await fetch('/api/messages'); const msgs = await msgsRes.json();
             const msgContainer = document.getElementById('adminMessagesBox');
             msgContainer.innerHTML = msgs.length === 0 ? '<div style="color:#888; font-size:14px;">Входящих сообщений нет.</div>' : '';
@@ -63,8 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {}
     }
 
-    // --- Пользователи ---
     async function loadAdminUsersTable() {
+        if (!currentUser || currentUser.role !== 'admin') return;
         try {
             const res = await fetch('/api/admin/users'); const usersList = await res.json();
             const tbody = document.getElementById('adminAllUsersTable'); tbody.innerHTML = '';
@@ -87,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch(e) {}
     }
 
-    // --- Реклама ---
     async function loadAdSettings() {
         try {
             const res = await fetch('/api/ad'); const ad = await res.json();
@@ -111,10 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('btnAdminClearMsgs').addEventListener('click', async () => {
-        if(confirm("Очистить все входящие сообщения?")) { await fetch('/api/messages', { method: 'DELETE' }); updateAdminStats(); }
+        if(confirm("Очистить все сообщения?")) { await fetch('/api/messages', { method: 'DELETE' }); updateAdminStats(); }
     });
 
-    // Инициализация
     updateAdminStats(); loadAdminUsersTable(); loadAdSettings();
-    setInterval(updateAdminStats, 5000);
+    setInterval(() => { if (document.getElementById('tab-dash').classList.contains('active')) updateAdminStats(); }, 5000);
 });
