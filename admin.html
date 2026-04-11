@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURA CORE | Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="ambient-bg">
+        <div class="bg-grid"></div><div class="glow-orb orb-1"></div><div class="glow-orb orb-2"></div>
+    </div>
+
+    <header class="topbar">
+        <div class="logo-wrapper" onclick="window.location.href='/'">
+            <div class="logo-text">AURA <span class="badge-nygma">BACK TO SITE</span></div>
+        </div>
+        <div style="color: var(--danger); font-weight: bold; text-transform: uppercase;">Superuser Access</div>
+    </header>
+
+    <main class="main-container" style="margin-top: 40px;">
+        <div class="glass-card" style="border-color: var(--danger); padding: 40px; width: 100%; max-width: 1000px;">
+            <h1 class="gradient-text">SYSTEM CORE <span style="color:var(--text-muted); font-size: 16px;">// Root</span></h1>
+            <p class="subtitle" style="margin-bottom: 30px;">Глобальная панель управления сервером</p>
+            
+            <div class="admin-stats">
+                <div class="stat-box"><div class="stat-label">АКТИВНЫЙ ОНЛАЙН</div><div class="stat-value" id="adminOnlineCount" style="color: var(--accent-1);">0</div></div>
+                <div class="stat-box"><div class="stat-label">Твой IP Адрес</div><div class="stat-value" id="adminIP" style="font-size: 16px;">Подключение...</div></div>
+            </div>
+
+            <div style="margin-top: 40px;">
+                <h3 style="margin-bottom: 15px; color: var(--text-main);">Мониторинг онлайна (Live сессии)</h3>
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead><tr><th>IP Адрес</th><th>Пользователь</th><th>Статус / Роль</th><th>Скачиваний</th></tr></thead>
+                        <tbody id="adminUsersTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px;">
+                <h3 style="margin-bottom: 15px; color: var(--text-main);">База зарегистрированных пользователей</h3>
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead><tr><th>Никнейм</th><th>Email</th><th>Текущая Роль</th><th>Изменить Роль</th></tr></thead>
+                        <tbody id="adminAllUsersTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px;">
+                <h3 style="margin-bottom: 15px; color: var(--text-main);">Входящие сообщения (Форма связи)</h3>
+                <div id="adminMessagesBox" style="background: #050505; border: 1px solid rgba(255,183,3,0.1); border-radius: 16px; padding: 20px; max-height: 300px; overflow-y: auto;"></div>
+            </div>
+            
+            <div style="margin-top: 30px; display: flex; gap: 10px;">
+                <button class="btn-text" id="btnAdminClearMsgs" style="color: var(--accent-1); border-color: var(--accent-1);">Очистить сообщения</button>
+                <button class="btn-text" onclick="window.location.href='/'">Выйти из панели</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="admin.js"></script>
+</body>
+</html>
