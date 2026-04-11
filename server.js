@@ -12,9 +12,34 @@ app.use(express.json());
 app.use(express.static(__dirname));
 
 let messages = [];
+
+// БАЗА ДАННЫХ (В оперативной памяти для прототипа)
+// Заранее создаем твой админский аккаунт (логин: nygma, пароль: 123)
+let users = [
+    { username: 'nygma', password: '123', role: 'admin' }
+];
+
+// Трекинг онлайн-сессий (IP -> данные пользователя)
 let activeSessions = new Map();
 
-// 1. Получение прямой ссылки
+// --- АВТОРИЗАЦИЯ ---
+app.post('/api/register', (req, res) => {
+    const { username, password } = req.body;
+    if (users.find(u => u.username === username)) {
+        return res.status(400).json({ error: 'Пользователь уже существует' });
+    }
+    users.push({ username, password, role: 'user' });
+    res.json({ success: true, username, role: 'user' });
+});
+
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    const user = users.find(u => u.username === username && u.password === password);
+    if (!user) return res.status(401).json({ error: 'Неверный логин или пароль' });
+    res.json({ success: true, username: user.username, role: user.role });
+});
+
+// --- API ЗАГРУЗКИ ---
 app.post('/api/download-info', async (req, res) => {
     const { url } = req.body;
     if (!url) return res.status(400).json({ error: 'URL is required' });
@@ -36,13 +61,21 @@ app.post('/api/download-info', async (req, res) => {
     }
 });
 
-// 2. ЖЕСТКОЕ ПРОКСИРОВАНИЕ (С маскировкой)
+// ПРОКСИ И ПОДСЧЕТ СКАЧИВАНИЙ
 app.get('/api/stream', async (req, res) => {
     const fileUrl = req.query.url;
+    const userIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    
     if (!fileUrl) return res.status(400).send('No URL provided');
 
+    // Увеличиваем счетчик скачиваний для этого IP
+    if (activeSessions.has(userIP)) {
+        let session = activeSessions.get(userIP);
+        session.downloads = (session.downloads || 0) + 1;
+        activeSessions.set(userIP, session);
+    }
+
     try {
-        // Притворяемся мобильным браузером Safari, чтобы обмануть защиту CDN соцсетей
         const response = await fetch(fileUrl, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
@@ -51,15 +84,9 @@ app.get('/api/stream', async (req, res) => {
             }
         });
 
-        // Если сервер всё равно заблокирован, НЕ выдаем ошибку (чтобы не было файла 21 байт)
-        // Вместо этого перенаправляем браузер пользователя напрямую на видео
-        if (!response.ok) {
-            console.log(`Proxy blocked (${response.status}). Redirecting directly to file.`);
-            return res.redirect(fileUrl);
-        }
+        if (!response.ok) return res.redirect(fileUrl);
         
-        // Заставляем браузер именно СКАЧИВАТЬ файл, а не открывать плеер
-        res.setHeader('Content-Disposition', 'attachment; filename="AURA_Video.mp4"');
+        res.setHeader('Content-Disposition', 'attachment; filename="AURA_Media.mp4"');
         res.setHeader('Content-Type', 'application/octet-stream'); 
         
         if (response.headers.get('content-length')) {
@@ -68,12 +95,11 @@ app.get('/api/stream', async (req, res) => {
 
         Readable.fromWeb(response.body).pipe(res);
     } catch (err) {
-        console.error('Stream error:', err);
-        res.redirect(fileUrl); // Последняя линия защиты
+        res.redirect(fileUrl);
     }
 });
 
-// 3. БАЗА СООБЩЕНИЙ
+// --- БАЗА СООБЩЕНИЙ ---
 app.post('/api/messages', (req, res) => {
     const { email, text } = req.body;
     messages.unshift({ email, text, date: new Date().toLocaleString() });
@@ -90,23 +116,47 @@ app.delete('/api/messages', (req, res) => {
     res.json({ success: true });
 });
 
-// 4. ТРЕКИНГ РЕАЛЬНОГО ОНЛАЙНА
+// --- СИСТЕМА ОНЛАЙНА И АДМИНКИ ---
 app.post('/api/ping', (req, res) => {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-    activeSessions.set(ip, Date.now());
+    const { username, role } = req.body; // Получаем данные от фронтенда
+    
+    let currentDownloads = 0;
+    if (activeSessions.has(ip)) {
+        currentDownloads = activeSessions.get(ip).downloads || 0;
+    }
+
+    activeSessions.set(ip, {
+        lastSeen: Date.now(),
+        username: username || null,
+        role: role || 'visitor',
+        downloads: currentDownloads
+    });
+
     res.json({ success: true });
 });
 
 app.get('/api/stats', (req, res) => {
     const now = Date.now();
-    for (let [ip, lastSeen] of activeSessions.entries()) {
-        if (now - lastSeen > 15000) {
-            activeSessions.delete(ip);
+    let sessionsData = [];
+
+    for (let [ip, data] of activeSessions.entries()) {
+        if (now - data.lastSeen > 15000) {
+            activeSessions.delete(ip); // Удаляем неактивных
+        } else {
+            sessionsData.push({
+                ip: ip,
+                username: data.username,
+                role: data.role,
+                downloads: data.downloads
+            });
         }
     }
-    res.json({ online: activeSessions.size });
+    
+    res.json({ 
+        online: activeSessions.size,
+        sessions: sessionsData
+    });
 });
 
-app.listen(PORT, () => {
-    console.log(`SYSTEM CORE ONLINE. Port: ${PORT}`);
-});
+app.listen(PORT, () => console.log(`SYSTEM CORE ONLINE. Port: ${PORT}`));
