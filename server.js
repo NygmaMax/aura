@@ -13,27 +13,28 @@ app.use(express.static(__dirname));
 
 let messages = [];
 
-// База пользователей (с дефолтной аватаркой)
+// База пользователей (добавлено поле email)
 let users = [
-    { username: 'nygma', password: '123', role: 'admin', avatar: '1' }
+    { username: 'nygma', password: '123', role: 'admin', avatar: '4', email: 'admin@nygma.core' }
 ];
 let activeSessions = new Map();
 
 // --- АВТОРИЗАЦИЯ И ПРОФИЛЬ ---
 app.post('/api/register', (req, res) => {
     const { username, password } = req.body;
-    if (users.find(u => u.username === username)) {
-        return res.status(400).json({ error: 'Пользователь уже существует' });
+    // Проверка на уникальность ника
+    if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
+        return res.status(400).json({ error: 'Этот никнейм уже занят!' });
     }
-    users.push({ username, password, role: 'user', avatar: '1' });
-    res.json({ success: true, username, role: 'user', avatar: '1' });
+    users.push({ username, password, role: 'user', avatar: '1', email: '' });
+    res.json({ success: true, username, role: 'user', avatar: '1', email: '' });
 });
 
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
-    const user = users.find(u => u.username === username && u.password === password);
+    const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
     if (!user) return res.status(401).json({ error: 'Неверный логин или пароль' });
-    res.json({ success: true, username: user.username, role: user.role, avatar: user.avatar });
+    res.json({ success: true, username: user.username, role: user.role, avatar: user.avatar, email: user.email || '' });
 });
 
 app.post('/api/update-avatar', (req, res) => {
@@ -41,6 +42,34 @@ app.post('/api/update-avatar', (req, res) => {
     let user = users.find(u => u.username === username);
     if (user) {
         user.avatar = avatar;
+        return res.json({ success: true });
+    }
+    res.status(400).json({ error: 'User not found' });
+});
+
+// Сохранение Email
+app.post('/api/update-email', (req, res) => {
+    const { username, email } = req.body;
+    let user = users.find(u => u.username === username);
+    if (user) {
+        user.email = email;
+        return res.json({ success: true });
+    }
+    res.status(400).json({ error: 'User not found' });
+});
+
+// --- АДМИНКА: УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯМИ ---
+app.get('/api/admin/users', (req, res) => {
+    // Отдаем список без паролей
+    const safeUsers = users.map(u => ({ username: u.username, role: u.role, email: u.email }));
+    res.json(safeUsers);
+});
+
+app.post('/api/admin/update-role', (req, res) => {
+    const { username, role } = req.body;
+    let user = users.find(u => u.username === username);
+    if (user) {
+        user.role = role;
         return res.json({ success: true });
     }
     res.status(400).json({ error: 'User not found' });
@@ -106,13 +135,13 @@ app.get('/api/stream', async (req, res) => {
     }
 });
 
+// --- СООБЩЕНИЯ И ОНЛАЙН ---
 app.post('/api/messages', (req, res) => {
     const { email, text } = req.body;
     messages.unshift({ email, text, date: new Date().toLocaleString() });
     if (messages.length > 50) messages.pop();
     res.json({ success: true });
 });
-
 app.get('/api/messages', (req, res) => res.json(messages));
 app.delete('/api/messages', (req, res) => { messages = []; res.json({ success: true }); });
 
